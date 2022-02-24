@@ -3,7 +3,9 @@ import gym
 import numpy as np
 
 # TODO: add type hint
-# TODO: merge steps?
+# TODO: If each step doesn't have immediately reward, 
+#       should it be merged into a single step by selecting from one of the combinations?
+#       Or just return zero reward?
 
 
 class ResMgmtEnv(gym.Env):
@@ -46,6 +48,7 @@ class ResMgmtEnv(gym.Env):
         self.state = None
 
     # TODO: for now just clear the job slot to all empty. Do we need to remove it from the list? if not we need to check for selecting empty slot?
+    #       Update: let's remove it from the list and also update the self.action_space so we can use action_space.sample()
     def step(self, action: int):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action), err_msg
