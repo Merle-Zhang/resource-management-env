@@ -3,6 +3,8 @@ import gym
 import numpy as np
 
 # TODO: add type hint
+# TODO: add unit test
+# TODO: split env from gym env class
 # TODO: If each step doesn't have immediately reward, 
 #       should it be merged into a single step by selecting from one of the combinations?
 #       Or just return zero reward?
@@ -52,17 +54,17 @@ class ResMgmtEnv(gym.Env):
     def step(self, action: int):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action), err_msg
-        # assert self.state is not None, "Call reset before using step method." # TODO: why? https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py#L116
+        assert self.state is not None, "Call reset before using step method."
 
         if action == self.num_job_slot or not self.__action_valid(action):
             self.__time_proceed()
             reward = self.__reward()
         else:
             self.__schedule(action)
-            reward = None
+            reward = 0 # TODO: valid when discount factor is 1. Might need to change it later.
 
         state = np.array(self.state, dtype=np.uintc)
-        reward = reward  # TODO: return None if not time proceed for now, but should return float/int
+        reward = reward
         done = not self.remaining_jobs
         info = {}
         return state, reward, done, info
@@ -112,26 +114,65 @@ class ResMgmtEnv(gym.Env):
 
         self.state[1] = slots
 
-    # TODO: implement
+    # TODO: merge __action_valid with __schedule
     def __schedule(self, action: int) -> None:
         # TODO: suppose not empty slot for now
+        job = self.state[1][action]
+        for type in range(self.num_resource_type):
+            assert not self.__empty(job[type]) # assert not empty for selected action
 
-        raise NotImplementedError
+            location = self.__find_fit(self.state[0][type], job[type])
+            if location == None:
+                raise ValueError("cannot be scheduled") # TODO: raise error or return false?
+
+            color = max(self.state[0][type]) + 1
+            for time in range(self.time_size):
+                if job[time * self.time_size + 0] == 0:
+                    job_time_size = time
+            for resource in range(self.resource_size):
+                if job[0 * self.time_size + resource] == 0:
+                    job_resource_size = resource
+            
+            # TODO: need some rewrite, only pass size of rec job
+
+
 
     # return a position or None
+    # TODO: assume rectangular for now. Might need to change later, e.g. more resource at the start and less later
     def __find_fit(self, cluster, job):
-        for row in range(self.time_size):
-            for col in range(self.resource_size):
-                if cluster[row * self.time_size + self.resource_size] != 0:
+        for time in range(self.time_size):
+            if job[time * self.time_size + 0] == 0:
+                job_time_size = time
+        for resource in range(self.resource_size):
+            if job[0 * self.time_size + resource] == 0:
+                job_resource_size = resource
+        for time in range(self.time_size):
+            for resource in range(self.resource_size):
+                if cluster[time * self.time_size + resource] != 0:
                     continue
-                if self.__try_fit(cluster, job, row, col):
-                    return row * self.time_size + self.resource_size
+                if self.__try_fit(cluster, time, resource, job_time_size, job_resource_size):
+                    return time * self.time_size + self.resource_size
         return None
 
-    def __try_fit(self, cluster, job, row, col) -> bool:
-        # TODO: dfs?
-        return False
+    def __try_fit(self, cluster, row, col, job_time_size, job_resource_size) -> bool:
+        for time in range(job_time_size):
+            if row + time >= self.time_size or self.__cell(cluster, col, row + time) != 0:
+                return False
+        for resource in range(job_resource_size):
+            if col + resource >= self.resource_size or self.__cell(cluster, col + resource, row) != 0:
+                return False
+        return True
+
+    def __reward(self) -> float:
+        return sum(-1 / self.__duration(job) for job in self.state[1] + self.remaining_jobs)
+
+    # TODO: check top left cell for now. Might need to change it later.
+    def __empty(self, slot) -> bool:
+        return slot[0] == 0
+
+    def __cell(self, block, resource, time):
+        return block[time * self.time_size + resource]
 
     # TODO: implement
-    def __reward(self) -> float:
+    def __duration(self, job) -> int:
         raise NotImplementedError
