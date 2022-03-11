@@ -18,17 +18,17 @@ class Clusters:
         resource_size: int,  # row
     ) -> None:
         shape = (num_resource_type, time_size, resource_size)
-        self.state = np.fill(shape, _EMPTY_CELL, dtype=int)
-        self.durations = {} # job_index -> duration
+        self.state = np.full(shape, _EMPTY_CELL, dtype=int)
+        self.duration_map = {}  # job_index -> duration
 
     def time_proceed(self) -> None:
         """Shift the cluster image up by one row.
         """
-        shape = self.state.shape
+        shape = list(self.state.shape)
         shape[1] = 1
-        new_empty_row = np.fill(shape, _EMPTY_CELL, dtype=int)
+        new_empty_row = np.full(shape, _EMPTY_CELL, dtype=int)
         np.concatenate(
-            (self.state[:,1:,:], new_empty_row), 
+            (self.state[:, 1:, :], new_empty_row),
             axis=1,
             out=self.state,
         )
@@ -42,4 +42,6 @@ class Clusters:
         # not_empty_cell_indices = np.where(self.state != _EMPTY_CELL)
         # return np.max(not_empty_cell_indices, axis=1)[1] + 1
         jobs_in_cluster = np.unique(self.state)
-        return np.vectorize(self.durations.get)(jobs_in_cluster).sum()
+        jobs_in_cluster = np.delete(
+            jobs_in_cluster, np.where(jobs_in_cluster == _EMPTY_CELL))
+        return np.vectorize(self.duration_map.get)(jobs_in_cluster).sum()
