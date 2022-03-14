@@ -20,10 +20,10 @@ class JobSlots:
 
     def __init__(
         self,
-        num_resource_type: int,  # d resource types
         num_job_slot: int,       # first M jobs
-        resource_size: int,      # row
+        num_resource_type: int,  # d resource types
         time_size: int,          # column
+        resource_size: int,      # row
     ) -> None:
         shape = (
             num_job_slot,

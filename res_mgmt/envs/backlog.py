@@ -18,6 +18,7 @@ class Backlog:
     def __init__(self) -> None:
         self.queue = deque[tuple[int, JobImage]]()
         self.state = 0
+        self.duration_map = {}  # job_index -> duration
 
     def add(self, job: Job, image: JobImage) -> None:
         """Add a job to the right side of the queue of backlog.
@@ -55,3 +56,11 @@ class Backlog:
         result = self.queue.popleft()
         self.state -= 1
         return result
+
+    def durations(self) -> int:
+        """The sum of the durations of all jobs in backlog.
+
+        Returns:
+            Sum of the durations of all jobs in backlog.
+        """
+        return sum(self.duration_map[id] for id, _ in self.queue)
