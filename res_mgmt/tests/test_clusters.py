@@ -24,8 +24,7 @@ class TestClustersInit(unittest.TestCase):
 class TestClustersTimeProceed(unittest.TestCase):
 
     def test_normal(self):
-        _ = randrange(1, 10)
-        clusters = Clusters(_, _, _)
+        clusters = Clusters.fromConfig()
 
         old_state = np.array(
             [[[0, 1, 2],
@@ -64,8 +63,7 @@ class TestClustersTimeProceed(unittest.TestCase):
 class TestClustersDurations(unittest.TestCase):
 
     def test_normal(self):
-        _ = randrange(1, 10)
-        clusters = Clusters(_, _, _)
+        clusters = Clusters.fromConfig()
 
         clusters.state = np.array(
             [[[3, 5, 5],

@@ -1,6 +1,6 @@
 import numpy as np
 
-from res_mgmt.envs.config import _EMPTY_CELL
+from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
 
 
 class Clusters:
@@ -8,18 +8,31 @@ class Clusters:
 
     Attributes:
         state: The cluster "image". Numpy array with shape (num_resource_type, time_size, resource_size)
-        durations: Map from the job id to its duration.
+        duration_map: Map from the job id to its duration.
     """
 
     def __init__(
         self,
         num_resource_type: int,  # d resource types
-        time_size: int,  # column
-        resource_size: int,  # row
+        time_size: int,          # column
+        resource_size: int,      # row
     ) -> None:
         shape = (num_resource_type, time_size, resource_size)
         self.state = np.full(shape, _EMPTY_CELL, dtype=int)
         self.duration_map = {}  # job_index -> duration
+
+    @classmethod
+    def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
+        """Create a cluster from config.
+
+        Args:
+            config: The config. If not specified, the default config will be used.
+        """
+        return cls(
+            num_resource_type=config["num_resource_type"],
+            time_size=config["time_size"],
+            resource_size=config["resource_size"],
+        )
 
     def time_proceed(self) -> None:
         """Shift the cluster image up by one row.
