@@ -1,9 +1,10 @@
 from typing import Optional
 
-from res_mgmt.envs.job import Job
-from res_mgmt.envs.clusters import Clusters
-from res_mgmt.envs.job_slots import JobSlots
 from res_mgmt.envs.backlog import Backlog
+from res_mgmt.envs.clusters import Clusters
+from res_mgmt.envs.config import Config, _DEFAULT_CONFIG
+from res_mgmt.envs.job import Job
+from res_mgmt.envs.job_slots import JobSlots
 
 
 class Res:
@@ -18,17 +19,40 @@ class Res:
     def __init__(
         self,
         num_resource_type: int,  # d resource types
-        resource_size: int,  # row
         time_size: int,  # column
+        resource_size: int,  # row
         num_job_slot: int,  # first M jobs
         # number of colors, TODO: num_job needed or just len(jobs)?
         num_job: int,
         size_backlog: int,  # TODO: size_backlog needed or just infinite?
         jobs: list  # shape(num_job, num_resource_type)
     ) -> None:
-        self.clusters = Clusters()
-        self.job_slots = JobSlots()
+        self.clusters = Clusters(
+            num_resource_type=num_resource_type,
+            time_size=time_size,
+            resource_size=resource_size,
+        )
+        self.job_slots = JobSlots(
+            num_resource_type=num_resource_type,
+            num_job_slot=num_job_slot,
+            time_size=time_size,
+            resource_size=resource_size,
+        )
         self.backlog = Backlog()
+
+    @classmethod
+    def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
+        """Create a res from config.
+
+        Args:
+            config: The config. If not specified, the default config will be used.
+        """
+        return cls(
+            num_resource_type=config["num_resource_type"],
+            num_job_slot=config["num_job_slot"],
+            time_size=config["time_size"],
+            resource_size=config["resource_size"],
+        )
 
     def actions(self) -> list[Optional[int]]:
         """Get available actions.
