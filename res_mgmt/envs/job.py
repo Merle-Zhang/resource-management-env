@@ -1,3 +1,7 @@
+import numpy as np
+import numpy.typing as npt
+
+
 class Job:
     """Job containing id and duration.
 
@@ -9,8 +13,8 @@ class Job:
     def __init__(
         self,
         id: int = None,
-        duration: int = None, # TODO: pass in image and evaluate all the properties
-        requirements: list[list[int]] = None,
+        duration: int = None,  # TODO: pass in image and evaluate all the properties
+        requirements: npt.NDArray[np.int_] = None,
         time_max: int = None,
     ) -> None:
         self.id = id

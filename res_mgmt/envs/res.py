@@ -40,8 +40,7 @@ class Res:
         )
         self.backlog = Backlog(meta=self.meta)
         self.job_slots.refill(self.backlog)
-        self.empty_cells_cluster = [
-            [resource_size] * time_size for _ in range(num_resource_type)]
+        self.empty_cells_cluster = np.full((num_resource_type, time_size), resource_size, dtype=int)
 
     @classmethod
     def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
@@ -101,7 +100,7 @@ class Res:
             int: _description_
         """
         job_meta = self.meta[job_id]
-        empty_cells_cluster = self.empty_cells_cluster  # TODO:
+        empty_cells_cluster = self.empty_cells_cluster
         time_size = self.clusters.state.shape[1]
         num_resource_type = self.clusters.state.shape[0]
         req = job_meta.requirements
@@ -110,7 +109,7 @@ class Res:
 
         def try_current_time(cluster_time, job_time):
             for resource_type in range(num_resource_type):
-                if empty_cells_cluster[resource_type][cluster_time] < req[resource_type][job_time]:
+                if empty_cells_cluster[resource_type, cluster_time] < req[resource_type, job_time]:
                     return False
             return True
 
@@ -156,16 +155,16 @@ class Res:
                 cluster_time = start_time_pos + job_time
                 job_resource_index = 0
                 for resource in range(resource_size):
-                    if job_resource_index >= req[resource_type][job_time]:
+                    if job_resource_index >= req[resource_type, job_time]:
                         break
                     cluster_pos = (resource_type, cluster_time, resource)
                     if self.clusters.state[cluster_pos] == _EMPTY_CELL:
                         self.clusters.state[cluster_pos] = job_id
                         job_resource_index += 1
-                if job_resource_index < req[resource_type][job_time]:
+                if job_resource_index < req[resource_type, job_time]:
                     msg = f"Wrong start time {start_time_pos}: Cluster time {cluster_time} cannot fit job time {job_time}."
                     raise ValueError(msg)
-                self.empty_cells_cluster[resource_type][cluster_time] -= req[resource_type][job_time]
+                self.empty_cells_cluster[resource_type, cluster_time] -= req[resource_type, job_time]
         self.job_slots.jobs[self.job_slots.jobs == job_id] = _EMPTY_CELL
         return True
 

@@ -58,16 +58,16 @@ class TestResFindPos(unittest.TestCase):
     def test_normal(self):
         res = Res.fromConfig()
         res.meta = {2: Job(
-            requirements=[
+            requirements=np.array([
                 [2, 2, 0, 0, 0],
                 [1, 1, 0, 0, 0],
-            ],
+            ]),
             time_max=2,
         )}
-        res.empty_cells_cluster = [
+        res.empty_cells_cluster = np.array([
             [0, 0, 1, 3, 3],
             [1, 0, 2, 3, 3],
-        ]
+        ])
         expected = 3
         actural = res.find_pos(2)
 
@@ -76,16 +76,16 @@ class TestResFindPos(unittest.TestCase):
     def test_cannot_find(self):
         res = Res.fromConfig()
         res.meta = {2: Job(
-            requirements=[
+            requirements=np.array([
                 [3, 3, 3, 0, 0],
                 [1, 1, 1, 0, 0],
-            ],
+            ]),
             time_max=3,
         )}
-        res.empty_cells_cluster = [
+        res.empty_cells_cluster = np.array([
             [0, 0, 1, 3, 3],
             [1, 0, 2, 3, 3],
-        ]
+        ])
         expected = -1
         actural = res.find_pos(2)
 
@@ -96,20 +96,20 @@ class TestResSchedule(unittest.TestCase):
     def test_normal(self):
         res = Res.fromConfig()
         res.meta = {2: Job(
-            requirements=[
+            requirements=np.array([
                 [2, 2, 0, 0, 0],
                 [1, 1, 0, 0, 0],
-            ],
+            ]),
             time_max=2,
         )}
-        res.empty_cells_cluster = [
+        res.empty_cells_cluster = np.array([
             [0, 0, 1, 3, 3],
             [1, 0, 2, 3, 3],
-        ]
-        new_empty_cells_cluster = [
+        ])
+        new_empty_cells_cluster = np.array([
             [0, 0, 1, 1, 1],
             [1, 0, 2, 2, 2],
-        ]
+        ])
         res.job_slots.jobs = np.array([0, 2, 3, 4, _EMPTY_CELL])
         new_jobs = np.array([0, _EMPTY_CELL, 3, 4, _EMPTY_CELL])
         res.clusters.state = np.array(
@@ -142,7 +142,7 @@ class TestResSchedule(unittest.TestCase):
         actural = res.schedule(2)
 
         self.assertEqual(expected, actural)
-        self.assertEqual(new_empty_cells_cluster, res.empty_cells_cluster)
+        np.testing.assert_allclose(new_empty_cells_cluster, res.empty_cells_cluster)
         np.testing.assert_allclose(new_jobs, res.job_slots.jobs)
         np.testing.assert_allclose(new_state, res.clusters.state)
 
