@@ -22,10 +22,6 @@ class Res:
         time_size: int,  # column
         resource_size: int,  # row
         num_job_slot: int,  # first M jobs
-        # number of colors, TODO: num_job needed or just len(jobs)?
-        num_job: int,
-        size_backlog: int,  # TODO: size_backlog needed or just infinite?
-        jobs: list  # shape(num_job, num_resource_type)
     ) -> None:
         self.clusters = Clusters(
             num_resource_type=num_resource_type,

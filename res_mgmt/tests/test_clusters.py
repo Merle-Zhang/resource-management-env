@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-from random import randrange
 
 
 from res_mgmt.envs.clusters import Clusters
