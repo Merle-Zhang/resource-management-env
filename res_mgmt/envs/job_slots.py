@@ -31,7 +31,7 @@ class JobSlots:
             time_size,
             resource_size,
         )
-        self.state = np.full(shape, False, dtype=bool)
+        self.state = np.full(shape, False, dtype=np.bool_)
         self.jobs = np.full(num_job_slot, _EMPTY_CELL, dtype=int)
         self.duration_map = {}  # job_index -> duration
 

@@ -4,7 +4,7 @@ import numpy.typing as npt
 
 from res_mgmt.envs.job import Job
 
-JobImage = npt.NDArray[np.bool]
+JobImage = npt.NDArray[np.bool_]
 
 
 class Backlog:
