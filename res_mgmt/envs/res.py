@@ -1,8 +1,9 @@
 from typing import Optional
+import numpy as np
 
 from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.clusters import Clusters
-from res_mgmt.envs.config import Config, _DEFAULT_CONFIG
+from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
 from res_mgmt.envs.job import Job
 from res_mgmt.envs.job_slots import JobSlots
 
@@ -23,18 +24,21 @@ class Res:
         resource_size: int,  # row
         num_job_slot: int,  # first M jobs
     ) -> None:
+        self.meta: dict[int, Job] = {}
         self.clusters = Clusters(
             num_resource_type=num_resource_type,
             time_size=time_size,
             resource_size=resource_size,
+            meta=self.meta,
         )
         self.job_slots = JobSlots(
             num_resource_type=num_resource_type,
             num_job_slot=num_job_slot,
             time_size=time_size,
             resource_size=resource_size,
+            meta=self.meta,
         )
-        self.backlog = Backlog()
+        self.backlog = Backlog(meta=self.meta)
         self.job_slots.refill(self.backlog)
 
     @classmethod
@@ -60,7 +64,9 @@ class Res:
         Returns:
             A list of integer or null.
         """
-        raise NotImplementedError
+        empty_slots = np.where(self.job_slots.jobs != _EMPTY_CELL)
+        assert(len(empty_slots) == 1)
+        return list(empty_slots[0]) + [None]
 
     def time_proceed(self) -> None:
         """Proceed to the next timestep.
