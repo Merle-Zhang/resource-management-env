@@ -15,6 +15,8 @@ class Res:
         clusters: The clusters containing the schedules jobs.
         job_slots: The job_slots containing the jobs to be scheduled.
         backlog: Unscheduled jobs that's not in job_slots.
+        meta: Metadata of jobs.
+        empty_cells_cluster: Empty cells per timestep (row) per resource type.
     """
 
     def __init__(
@@ -40,7 +42,8 @@ class Res:
         )
         self.backlog = Backlog(meta=self.meta)
         self.job_slots.refill(self.backlog)
-        self.empty_cells_cluster = np.full((num_resource_type, time_size), resource_size, dtype=int)
+        self.empty_cells_cluster = np.full(
+            (num_resource_type, time_size), resource_size, dtype=int)
 
     @classmethod
     def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
@@ -63,7 +66,7 @@ class Res:
         or an null action which means not choosing anything.
 
         Returns:
-            A list of integer or null.
+            list[Optional[int]]: A list of indices of jobs and a null.
         """
         empty_slots = np.where(self.job_slots.jobs != _EMPTY_CELL)
         assert(len(empty_slots) == 1)
@@ -78,26 +81,26 @@ class Res:
         self.clusters.time_proceed()
         self.job_slots.refill(self.backlog)
 
-    def durations(self) -> list[int]:
+    def durations(self) -> int:
         """Durations for all jobs in the systems either scheduled or waiting for service.
 
         Concatenate durations from clusters, job_slots, and backlog.
 
-        TODO: Might be slow. Potential performance improvement.
-
         Returns:
-            A list of durations as int.
+            int: Total durations.
         """
         return self.clusters.durations() + self.job_slots.durations() + self.backlog.durations()
 
     def find_pos(self, job_id: int) -> int:
-        """_summary_
+        """Find available position given the job id.
+
+        Find the starting position (row/timestep) that fit the job.
 
         Args:
-            job_id (int): _description_
+            job_id (int): Id of the job.
 
         Returns:
-            int: _description_
+            int: [0 - time_size] if found available position, otherwise -1.
         """
         job_meta = self.meta[job_id]
         empty_cells_cluster = self.empty_cells_cluster
@@ -127,20 +130,20 @@ class Res:
         return start_index
 
     def schedule(self, job_id: int) -> bool:
-        """Schedule the job in the job slot `job`.
+        """Schedule the job given job id.
 
         Schedule the selected job in the first possible timestep in the cluster, 
         (i.e., the first timestep in which the job’s resource requirements can be 
-        fully satisfied till completion)s
+        fully satisfied till completion).
 
         Args:
-            job: The selected job to be scheduled.
-
-        Returns:
-            False if the job cannot be scheduled, i.e., does not "fit".
+            job_id (int): The selected job to be scheduled.
 
         Raises:
             ValueError: An error occurred poping from wrong result from `find_pos()`.
+
+        Returns:
+            bool: False if the job cannot be scheduled, i.e., does not "fit".
         """
         start_time_pos = self.find_pos(job_id)
         if start_time_pos == -1:
@@ -164,7 +167,8 @@ class Res:
                 if job_resource_index < req[resource_type, job_time]:
                     msg = f"Wrong start time {start_time_pos}: Cluster time {cluster_time} cannot fit job time {job_time}."
                     raise ValueError(msg)
-                self.empty_cells_cluster[resource_type, cluster_time] -= req[resource_type, job_time]
+                self.empty_cells_cluster[resource_type,
+                                         cluster_time] -= req[resource_type, job_time]
         self.job_slots.jobs[self.job_slots.jobs == job_id] = _EMPTY_CELL
         return True
 
@@ -172,6 +176,6 @@ class Res:
         """The state (image) of clusters, job slots, and backlog.
 
         Returns:
-            A list of [clusters_state, job_slots_state, backlog_state].
+            list: A list of [clusters_state, job_slots_state, backlog_state].
         """
         return [self.clusters.state, self.job_slots.state, self.backlog.state]
