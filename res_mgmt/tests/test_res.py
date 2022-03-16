@@ -139,7 +139,7 @@ class TestResSchedule(unittest.TestCase):
               [ 2, -1, -1]]]
         )
         expected = True
-        actural = res.schedule(2)
+        actural = res.schedule(2, 3)
 
         self.assertEqual(expected, actural)
         np.testing.assert_allclose(new_empty_cells_cluster, res.empty_cells_cluster)

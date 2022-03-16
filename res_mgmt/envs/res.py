@@ -129,7 +129,7 @@ class Res:
             return -1
         return start_index
 
-    def schedule(self, job_id: int) -> bool:
+    def schedule(self, job_id: int, start_time_pos: int) -> bool:
         """Schedule the job given job id.
 
         Schedule the selected job in the first possible timestep in the cluster, 
@@ -145,7 +145,6 @@ class Res:
         Returns:
             bool: False if the job cannot be scheduled, i.e., does not "fit".
         """
-        start_time_pos = self.find_pos(job_id)
         if start_time_pos == -1:
             return False
         job_meta = self.meta[job_id]
