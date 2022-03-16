@@ -13,12 +13,16 @@ class Backlog:
     Attributes:
         state: The number of job in backlog.
         queue: The queue of `(id, job)`s.
+        meta: Map from the job id to its metadata in Job.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        meta: dict[int, Job],    # meta data of jobs {job_index -> job_meta}
+    ) -> None:
         self.queue = deque[tuple[int, JobImage]]()
         self.state = 0
-        self.duration_map = {}  # job_index -> duration
+        self.meta = meta
 
     def add(self, job: Job, image: JobImage) -> None:
         """Add a job to the right side of the queue of backlog.
@@ -63,4 +67,4 @@ class Backlog:
         Returns:
             Sum of the durations of all jobs in backlog.
         """
-        return sum(self.duration_map[id] for id, _ in self.queue)
+        return sum(self.meta[id].duration for id, _ in self.queue)

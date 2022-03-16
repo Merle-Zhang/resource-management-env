@@ -5,20 +5,23 @@ import numpy as np
 from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.clusters import Clusters
 from res_mgmt.envs.job import Job
+from res_mgmt.tests.utils import meta_from_durations
 
 
 class TestBacklogInit(unittest.TestCase):
 
     def test_normal(self):
-        backlog = Backlog()
+        meta = {1: Job()}
+        backlog = Backlog(meta=meta)
         self.assertEqual(backlog.state, 0)
         self.assertFalse(backlog.queue)
+        self.assertTrue(backlog.meta is meta)
 
 
 class TestBacklogAdd(unittest.TestCase):
 
     def test_normal(self):
-        backlog = Backlog()
+        backlog = Backlog(meta=None)
         backlog.state = 1
         backlog.queue = deque([
             (
@@ -104,7 +107,7 @@ class TestBacklogAdd(unittest.TestCase):
 class TestBacklogGet(unittest.TestCase):
 
     def test_normal(self):
-        backlog = Backlog()
+        backlog = Backlog(meta=None)
         backlog.state = 1
         backlog.queue = deque([
             (
@@ -148,16 +151,7 @@ class TestBacklogGet(unittest.TestCase):
 class TestBacklogDurations(unittest.TestCase):
 
     def test_normal(self):
-        backlog = Backlog()
-        backlog.queue = deque([
-            (1, None),
-            (4, None),
-            (3, None),
-            (6, None),
-            (8, None),
-        ])
-
-        backlog.duration_map = {
+        meta = meta_from_durations({
             1: 1,
             2: 4,
             3: 8,
@@ -166,7 +160,15 @@ class TestBacklogDurations(unittest.TestCase):
             6: 2,
             7: 1,
             8: 2,
-        }
+        })
+        backlog = Backlog(meta=meta)
+        backlog.queue = deque([
+            (1, None),
+            (4, None),
+            (3, None),
+            (6, None),
+            (8, None),
+        ])
 
         expected = (
             1 +

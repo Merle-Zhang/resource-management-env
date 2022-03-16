@@ -1,6 +1,7 @@
 import numpy as np
 
 from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
+from res_mgmt.envs.job import Job
 
 
 class Clusters:
@@ -8,7 +9,7 @@ class Clusters:
 
     Attributes:
         state: The cluster "image". Numpy array with shape (num_resource_type, time_size, resource_size)
-        duration_map: Map from the job id to its duration.
+        meta: Map from the job id to its metadata in Job.
     """
 
     def __init__(
@@ -16,10 +17,11 @@ class Clusters:
         num_resource_type: int,  # d resource types
         time_size: int,          # column
         resource_size: int,      # row
+        meta: dict[int, Job],    # meta data of jobs {job_index -> job_meta}
     ) -> None:
         shape = (num_resource_type, time_size, resource_size)
         self.state = np.full(shape, _EMPTY_CELL, dtype=int)
-        self.duration_map = {}  # job_index -> duration
+        self.meta = meta
 
     @classmethod
     def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
@@ -32,6 +34,7 @@ class Clusters:
             num_resource_type=config["num_resource_type"],
             time_size=config["time_size"],
             resource_size=config["resource_size"],
+            meta={},
         )
 
     def time_proceed(self) -> None:
@@ -57,4 +60,7 @@ class Clusters:
         jobs_in_cluster = np.unique(self.state)
         jobs_in_cluster = np.delete(
             jobs_in_cluster, np.where(jobs_in_cluster == _EMPTY_CELL))
-        return np.vectorize(self.duration_map.get)(jobs_in_cluster).sum()
+
+        def get_duration(id: int):
+            return self.meta[id].duration
+        return np.vectorize(get_duration)(jobs_in_cluster).sum()

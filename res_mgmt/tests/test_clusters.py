@@ -5,6 +5,8 @@ from random import randrange
 
 from res_mgmt.envs.clusters import Clusters
 from res_mgmt.envs.config import _EMPTY_CELL
+from res_mgmt.envs.job import Job
+from res_mgmt.tests.utils import meta_from_durations
 
 
 class TestClustersInit(unittest.TestCase):
@@ -13,12 +15,13 @@ class TestClustersInit(unittest.TestCase):
         num_resource_type = 2
         time_size = 5
         resource_size = 3
-        clusters = Clusters(num_resource_type, time_size, resource_size)
+        meta = {1: Job()}
+        clusters = Clusters(num_resource_type, time_size, resource_size, meta)
 
         self.assertEqual(clusters.state.shape,
                          (num_resource_type, time_size, resource_size))
         np.testing.assert_allclose(clusters.state, _EMPTY_CELL)
-        self.assertEqual(clusters.duration_map, {})
+        self.assertTrue(clusters.meta is meta)
 
 
 class TestClustersTimeProceed(unittest.TestCase):
@@ -79,14 +82,14 @@ class TestClustersDurations(unittest.TestCase):
               [-1, 3, -1]]]
         )
 
-        clusters.duration_map = {
+        clusters.meta = meta_from_durations({
             3: 8,
             4: 6,
             5: 7,
             6: 2,
             7: 1,
             8: 2,
-        }
+        })
 
         expected = (
             8 +

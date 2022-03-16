@@ -2,6 +2,7 @@ import numpy as np
 
 from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
+from res_mgmt.envs.job import Job
 
 
 class JobSlots:
@@ -14,8 +15,8 @@ class JobSlots:
         jobs: 
             Array of length num_job_slot indicating the job id 
             of the corresponding job in the slots.
-        duration_map: 
-            Map from the job id to its duration.
+        meta: 
+            Map from the job id to its metadata in Job.
     """
 
     def __init__(
@@ -24,6 +25,7 @@ class JobSlots:
         num_resource_type: int,  # d resource types
         time_size: int,          # column
         resource_size: int,      # row
+        meta: dict[int, Job],    # meta data of jobs {job_index -> job_meta}
     ) -> None:
         shape = (
             num_job_slot,
@@ -33,7 +35,7 @@ class JobSlots:
         )
         self.state = np.full(shape, False, dtype=np.bool_)
         self.jobs = np.full(num_job_slot, _EMPTY_CELL, dtype=int)
-        self.duration_map = {}  # job_index -> duration
+        self.meta = meta
 
     @classmethod
     def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
@@ -47,6 +49,7 @@ class JobSlots:
             num_job_slot=config["num_job_slot"],
             time_size=config["time_size"],
             resource_size=config["resource_size"],
+            meta={},
         )
 
     def refill(self, backlog: Backlog) -> None:
@@ -69,4 +72,7 @@ class JobSlots:
         """
         jobs_in_cluster = np.delete(
             self.jobs, np.where(self.jobs == _EMPTY_CELL))
-        return np.vectorize(self.duration_map.get)(jobs_in_cluster).sum()
+
+        def get_duration(id: int):
+            return self.meta[id].duration
+        return np.vectorize(get_duration)(jobs_in_cluster).sum()
