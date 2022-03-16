@@ -33,6 +33,11 @@ class TestResInit(unittest.TestCase):
         self.assertTrue(res.meta is res.clusters.meta)
         self.assertTrue(res.meta is res.job_slots.meta)
         self.assertTrue(res.meta is res.backlog.meta)
+        np.testing.assert_allclose(res.empty_cells_cluster, [
+            [3, 3, 3, 3, 3],
+            [3, 3, 3, 3, 3],
+        ])
+
 
 
 class TestResActions(unittest.TestCase):
@@ -48,11 +53,98 @@ class TestResActions(unittest.TestCase):
         self.assertEqual(expected, actural)
 
 
+class TestResFindPos(unittest.TestCase):
+
+    def test_normal(self):
+        res = Res.fromConfig()
+        res.meta = {2: Job(
+            requirements=[
+                [2, 2, 0, 0, 0],
+                [1, 1, 0, 0, 0],
+            ],
+            time_max=2,
+        )}
+        res.empty_cells_cluster = [
+            [0, 0, 1, 3, 3],
+            [1, 0, 2, 3, 3],
+        ]
+        expected = 3
+        actural = res.find_pos(2)
+
+        self.assertEqual(expected, actural)
+
+    def test_cannot_find(self):
+        res = Res.fromConfig()
+        res.meta = {2: Job(
+            requirements=[
+                [3, 3, 3, 0, 0],
+                [1, 1, 1, 0, 0],
+            ],
+            time_max=3,
+        )}
+        res.empty_cells_cluster = [
+            [0, 0, 1, 3, 3],
+            [1, 0, 2, 3, 3],
+        ]
+        expected = -1
+        actural = res.find_pos(2)
+
+        self.assertEqual(expected, actural)
+
 class TestResSchedule(unittest.TestCase):
 
     def test_normal(self):
         res = Res.fromConfig()
-        res.schedule(None)
+        res.meta = {2: Job(
+            requirements=[
+                [2, 2, 0, 0, 0],
+                [1, 1, 0, 0, 0],
+            ],
+            time_max=2,
+        )}
+        res.empty_cells_cluster = [
+            [0, 0, 1, 3, 3],
+            [1, 0, 2, 3, 3],
+        ]
+        new_empty_cells_cluster = [
+            [0, 0, 1, 1, 1],
+            [1, 0, 2, 2, 2],
+        ]
+        res.job_slots.jobs = np.array([0, 2, 3, 4, _EMPTY_CELL])
+        new_jobs = np.array([0, _EMPTY_CELL, 3, 4, _EMPTY_CELL])
+        res.clusters.state = np.array(
+            [[[ 1,  1,  1],
+              [ 1,  1,  1],
+              [ 1,  1, -1],
+              [-1, -1, -1],
+              [-1, -1, -1]],
+
+             [[ 1,  1, -1],
+              [ 1,  1,  1],
+              [ 1, -1, -1],
+              [-1, -1, -1],
+              [-1, -1, -1]]]
+        )
+        new_state = np.array(
+            [[[ 1,  1,  1],
+              [ 1,  1,  1],
+              [ 1,  1, -1],
+              [ 2,  2, -1],
+              [ 2,  2, -1]],
+
+             [[ 1,  1, -1],
+              [ 1,  1,  1],
+              [ 1, -1, -1],
+              [ 2, -1, -1],
+              [ 2, -1, -1]]]
+        )
+        expected = True
+        actural = res.schedule(2)
+
+        self.assertEqual(expected, actural)
+        self.assertEqual(new_empty_cells_cluster, res.empty_cells_cluster)
+        np.testing.assert_allclose(new_jobs, res.job_slots.jobs)
+        np.testing.assert_allclose(new_state, res.clusters.state)
 
 
 if __name__ == '__main__':

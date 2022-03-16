@@ -40,6 +40,8 @@ class Res:
         )
         self.backlog = Backlog(meta=self.meta)
         self.job_slots.refill(self.backlog)
+        self.empty_cells_cluster = [
+            [resource_size] * time_size for _ in range(num_resource_type)]
 
     @classmethod
     def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
@@ -89,7 +91,43 @@ class Res:
         """
         return self.clusters.durations() + self.job_slots.durations() + self.backlog.durations()
 
-    def schedule(self, job: Job) -> bool:
+    def find_pos(self, job_id: int) -> int:
+        """_summary_
+
+        Args:
+            job_id (int): _description_
+
+        Returns:
+            int: _description_
+        """
+        job_meta = self.meta[job_id]
+        empty_cells_cluster = self.empty_cells_cluster  # TODO:
+        time_size = self.clusters.state.shape[1]
+        num_resource_type = self.clusters.state.shape[0]
+        req = job_meta.requirements
+        index_time = 0
+        start_index = 0
+
+        def try_current_time(cluster_time, job_time):
+            for resource_type in range(num_resource_type):
+                if empty_cells_cluster[resource_type][cluster_time] < req[resource_type][job_time]:
+                    return False
+            return True
+
+        for time in range(time_size):
+            if index_time >= job_meta.time_max:
+                break
+            if try_current_time(time, index_time):
+                index_time += 1
+            else:
+                index_time = 0
+                start_index = time + 1
+
+        if index_time < job_meta.time_max:
+            return -1
+        return start_index
+
+    def schedule(self, job_id: int) -> bool:
         """Schedule the job in the job slot `job`.
 
         Schedule the selected job in the first possible timestep in the cluster, 
@@ -101,8 +139,35 @@ class Res:
 
         Returns:
             False if the job cannot be scheduled, i.e., does not "fit".
+
+        Raises:
+            ValueError: An error occurred poping from wrong result from `find_pos()`.
         """
-        raise NotImplementedError
+        start_time_pos = self.find_pos(job_id)
+        if start_time_pos == -1:
+            return False
+        job_meta = self.meta[job_id]
+        num_resource_type = self.clusters.state.shape[0]
+        resource_size = self.clusters.state.shape[2]
+        req = job_meta.requirements
+
+        for resource_type in range(num_resource_type):
+            for job_time in range(job_meta.time_max):
+                cluster_time = start_time_pos + job_time
+                job_resource_index = 0
+                for resource in range(resource_size):
+                    if job_resource_index >= req[resource_type][job_time]:
+                        break
+                    cluster_pos = (resource_type, cluster_time, resource)
+                    if self.clusters.state[cluster_pos] == _EMPTY_CELL:
+                        self.clusters.state[cluster_pos] = job_id
+                        job_resource_index += 1
+                if job_resource_index < req[resource_type][job_time]:
+                    msg = f"Wrong start time {start_time_pos}: Cluster time {cluster_time} cannot fit job time {job_time}."
+                    raise ValueError(msg)
+                self.empty_cells_cluster[resource_type][cluster_time] -= req[resource_type][job_time]
+        self.job_slots.jobs[self.job_slots.jobs == job_id] = _EMPTY_CELL
+        return True
 
     def state(self) -> list:
         """The state (image) of clusters, job slots, and backlog.
