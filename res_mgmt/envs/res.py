@@ -81,7 +81,7 @@ class Res:
         self.clusters.time_proceed()
         self.job_slots.refill(self.backlog)
 
-    def durations(self) -> int:
+    def durations(self) -> npt.NDArray[np.int_]:
         """Durations for all jobs in the systems either scheduled or waiting for service.
 
         Concatenate durations from clusters, job_slots, and backlog.
@@ -89,7 +89,9 @@ class Res:
         Returns:
             int: Total durations.
         """
-        return self.clusters.durations() + self.job_slots.durations() + self.backlog.durations()
+        durations = (self.clusters.durations(),
+                     self.job_slots.durations(), self.backlog.durations())
+        return np.concatenate(durations)
 
     def find_pos(self, job_id: int) -> int:
         """Find available position given the job id.
@@ -180,6 +182,12 @@ class Res:
         return [self.clusters.state, self.job_slots.state, self.backlog.state]
 
     def add_jobs(self, jobs: npt.NDArray[np.bool_]) -> None:
+        """Add jobs to res.
+
+        Args:
+            jobs (npt.NDArray[np.bool_]): 
+                list of jobs. List shape (num_job, num_resource_type, time_size, resource_size).
+        """
         (num_job,
          num_resource_type,
          time_size,
@@ -190,3 +198,13 @@ class Res:
             job = Job.fromImage(i, jobs[i])
             self.meta[i] = job
             self.backlog.add(job, jobs[i])
+
+    def finish(self) -> bool:
+        """Check if finished all jobs.
+
+        Returns:
+            bool: If finished all jobs.
+        """
+        job_slots = (self.job_slots.jobs == _EMPTY_CELL).all()
+        backlog = not self.backlog.queue
+        return job_slots and backlog

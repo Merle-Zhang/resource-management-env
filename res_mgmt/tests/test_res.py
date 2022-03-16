@@ -201,5 +201,12 @@ class TestResAddJobs(unittest.TestCase):
         np.testing.assert_allclose(res.backlog.queue[1][1], jobs[1])
 
 
+class TestResFinish(unittest.TestCase):
+
+    def test_normal(self):
+        res = Res.fromConfig()
+        self.assertTrue(res.finish())
+
+
 if __name__ == '__main__':
     unittest.main()
