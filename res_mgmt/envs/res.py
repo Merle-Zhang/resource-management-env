@@ -39,6 +39,7 @@ class Res:
             resource_size=resource_size,
         )
         self.backlog = Backlog()
+        self.job_slots.refill(self.backlog)
 
     @classmethod
     def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
@@ -100,3 +101,11 @@ class Res:
             False if the job cannot be scheduled, i.e., does not "fit".
         """
         raise NotImplementedError
+
+    def state(self) -> list:
+        """The state (image) of clusters, job slots, and backlog.
+
+        Returns:
+            A list of [clusters_state, job_slots_state, backlog_state].
+        """
+        return [self.clusters.state, self.job_slots.state, self.backlog.state]
