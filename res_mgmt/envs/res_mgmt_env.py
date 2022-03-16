@@ -2,6 +2,8 @@ from typing import Optional
 import gym
 import numpy as np
 
+from res_mgmt.envs.res import Res
+
 # TODO: add type hint
 # TODO: add unit test
 # TODO: split env from gym env class
@@ -47,6 +49,7 @@ class ResMgmtEnv(gym.Env):
             "backlog": gym.space.Discrete(size_backlog)
         })
 
+        self.res = None
         self.state = None
 
     # TODO: for now just clear the job slot to all empty. Do we need to remove it from the list? if not we need to check for selecting empty slot?
@@ -82,8 +85,19 @@ class ResMgmtEnv(gym.Env):
 
         backlog = len(self.remaining_jobs)
 
-        self.state = [clusters, slots, backlog]
-        return np.array(self.state, dtype=np.uintc)
+
+        self.res = Res(
+            num_resource_type=self.num_resource_type,
+            time_size=self.time_size,
+            resource_size=self.resource_size,
+            num_job_slot=self.num_job_slot,
+            num_job=self.num_job,
+            size_backlog=self.size_backlog,
+            jobs=self.jobs,
+        )
+
+        self.state = self.res.state()
+        return np.array(self.state, dtype=int)
 
     # TODO: schedule a job that does “fit”
     def __action_valid(self, action: int) -> bool:
