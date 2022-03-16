@@ -169,14 +169,9 @@ class TestJobSlotsDurations(unittest.TestCase):
             8: 2,
         })
 
-        expected = (
-            1 +
-            8 +
-            6 +
-            2
-        )
+        expected = [1, 8, 6, 2]
 
-        self.assertEqual(job_slots.durations(), expected)
+        np.testing.assert_allclose(job_slots.durations(), expected)
 
 
 if __name__ == '__main__':

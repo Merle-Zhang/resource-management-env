@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.typing as npt
 
 from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
@@ -64,15 +65,15 @@ class JobSlots:
             self.jobs[index] = id
             self.state[index] = image
 
-    def durations(self) -> int:
+    def durations(self) -> npt.NDArray[np.int_]:
         """The sum of the durations of all jobs in job slots.
 
         Returns:
-            Sum of the durations of all jobs in job slots.
+            List of the durations of all jobs in job slots.
         """
         jobs_in_cluster = np.delete(
             self.jobs, np.where(self.jobs == _EMPTY_CELL))
 
         def get_duration(id: int):
             return self.meta[id].duration
-        return np.vectorize(get_duration)(jobs_in_cluster).sum()
+        return np.vectorize(get_duration)(jobs_in_cluster)

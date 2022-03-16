@@ -90,16 +90,9 @@ class TestClustersDurations(unittest.TestCase):
             8: 2,
         })
 
-        expected = (
-            8 +
-            6 +
-            7 +
-            2 +
-            1 +
-            2
-        )
+        expected = [8, 6, 7, 2, 1, 2]
 
-        self.assertEqual(clusters.durations(), expected)
+        np.testing.assert_allclose(clusters.durations(), expected)
 
 
 if __name__ == '__main__':

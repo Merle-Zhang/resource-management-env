@@ -61,10 +61,10 @@ class Backlog:
         self.state -= 1
         return result
 
-    def durations(self) -> int:
+    def durations(self) -> npt.NDArray[np.int_]:
         """The sum of the durations of all jobs in backlog.
 
         Returns:
-            Sum of the durations of all jobs in backlog.
+            List of durations of all jobs in backlog.
         """
-        return sum(self.meta[id].duration for id, _ in self.queue)
+        return np.array([self.meta[id].duration for id, _ in self.queue])

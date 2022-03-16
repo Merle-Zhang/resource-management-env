@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.typing as npt
 
 from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
 from res_mgmt.envs.job import Job
@@ -49,11 +50,11 @@ class Clusters:
             out=self.state,
         )
 
-    def durations(self) -> int:
+    def durations(self) -> npt.NDArray[np.int_]:
         """The sum of the durations of all jobs in clusters.
 
         Returns:
-            Sum of the durations of all jobs in cluster.
+            List of the durations of all jobs in cluster.
         """
         # not_empty_cell_indices = np.where(self.state != _EMPTY_CELL)
         # return np.max(not_empty_cell_indices, axis=1)[1] + 1
@@ -63,4 +64,4 @@ class Clusters:
 
         def get_duration(id: int):
             return self.meta[id].duration
-        return np.vectorize(get_duration)(jobs_in_cluster).sum()
+        return np.vectorize(get_duration)(jobs_in_cluster)

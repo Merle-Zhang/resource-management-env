@@ -170,15 +170,9 @@ class TestBacklogDurations(unittest.TestCase):
             (8, None),
         ])
 
-        expected = (
-            1 +
-            6 +
-            8 +
-            2 + 
-            2
-        )
+        expected = [1, 6, 8, 2, 2]
 
-        self.assertEqual(backlog.durations(), expected)
+        np.testing.assert_allclose(backlog.durations(), expected)
 
 
 if __name__ == '__main__':
