@@ -25,11 +25,11 @@ class Job:
     @classmethod
     def fromImage(cls, id: int, image: npt.NDArray[np.bool_]):
         duration = Job.duration(image)
-        requirement = Job.requirement(image)
+        requirements = Job.requirements(image)
         return cls(
             id=id,
             duration=duration,
-            requirements=requirement,
+            requirements=requirements,
             time_max=duration,
         )
 
@@ -38,5 +38,23 @@ class Job:
         return np.max(np.where(image == True), axis=1)[1] + 1
 
     @staticmethod
-    def requirement(image: npt.NDArray[np.bool_]) -> npt.NDArray[np.int_]:
+    def requirements(image: npt.NDArray[np.bool_]) -> npt.NDArray[np.int_]:
         return image.sum(axis=2)
+
+    def __eq__(self, other):
+        if isinstance(other, Job):
+            return (
+                self.id == other.id and
+                self.duration == other.duration and
+                (self.requirements == other.requirements).all() and
+                self.time_max == other.time_max)
+        return False
+
+    def __repr__(self):
+        str = """Job(
+  id={},
+  duration={},
+  requirements={},
+  time_max={},
+)"""
+        return str.format(self.id, self.duration, self.requirements, self.time_max)

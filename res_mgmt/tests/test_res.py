@@ -147,5 +147,59 @@ class TestResSchedule(unittest.TestCase):
         np.testing.assert_allclose(new_state, res.clusters.state)
 
 
+class TestResAddJobs(unittest.TestCase):
+
+    def test_normal(self):
+        res = Res.fromConfig()
+        jobs = np.array(
+            [[[[ True, False, False],
+               [False,  True, False],
+               [False, False, False],
+               [ True,  True,  True],
+               [False,  True, False]],
+
+              [[False, False, False],
+               [ True,  True,  True],
+               [False, False, False],
+               [ True, False,  True],
+               [ True, False,  True]]],
+
+
+             [[[ True,  True,  True],
+               [False,  True, False],
+               [ True,  True, False],
+               [False, False,  True],
+               [False, False, False]],
+
+              [[False,  True, False],
+               [False,  True,  True],
+               [ True, False, False],
+               [ True,  True, False],
+               [False, False, False]]]]
+        )
+        res.add_jobs(jobs)
+
+        self.assertEqual(res.meta[0], Job(
+            id=0,
+            duration=5,
+            requirements=np.array([
+                [1, 1, 0, 3, 1], 
+                [0, 3, 0, 2, 2]]),
+            time_max=5,
+        ))
+        self.assertEqual(res.meta[1], Job(
+            id=1,
+            duration=4,
+            requirements=np.array([
+                [3, 1, 2, 1, 0], 
+                [1, 2, 1, 2, 0]]),
+            time_max=4,
+        ))
+        self.assertEqual(res.backlog.queue[0][0], 0)
+        np.testing.assert_allclose(res.backlog.queue[0][1], jobs[0])
+        self.assertEqual(res.backlog.queue[1][0], 1)
+        np.testing.assert_allclose(res.backlog.queue[1][1], jobs[1])
+
+
 if __name__ == '__main__':
     unittest.main()

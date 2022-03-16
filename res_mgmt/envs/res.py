@@ -1,5 +1,6 @@
 from typing import Optional
 import numpy as np
+import numpy.typing as npt
 
 from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.clusters import Clusters
@@ -41,7 +42,6 @@ class Res:
             meta=self.meta,
         )
         self.backlog = Backlog(meta=self.meta)
-        self.job_slots.refill(self.backlog)
         self.empty_cells_cluster = np.full(
             (num_resource_type, time_size), resource_size, dtype=int)
 
@@ -179,3 +179,15 @@ class Res:
             list: A list of [clusters_state, job_slots_state, backlog_state].
         """
         return [self.clusters.state, self.job_slots.state, self.backlog.state]
+
+    def add_jobs(self, jobs: npt.NDArray[np.bool_]) -> None:
+        (num_job,
+         num_resource_type,
+         time_size,
+         resource_size) = jobs.shape
+        assert((num_resource_type, time_size, resource_size)
+               == self.clusters.state.shape)
+        for i in range(num_job):
+            job = Job.fromImage(i, jobs[i])
+            self.meta[i] = job
+            self.backlog.add(job, jobs[i])
