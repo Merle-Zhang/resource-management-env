@@ -31,17 +31,17 @@ class ResMgmtEnv(gym.Env):
         # (number of colors + empty) * (row size * column size)
         cluster_image = gym.spaces.MultiDiscrete(
             [num_job + 1] * (resource_size * time_size))
-        job_slot_image = gym.space.MultiBinary(resource_size * time_size)
+        job_slot_image = gym.spaces.MultiBinary(resource_size * time_size)
 
         # TODO: unused observation space
         self.observation_space = gym.spaces.Dict({
-            "clusters": gym.space.Tuple(tuple(
+            "clusters": gym.spaces.Tuple(tuple(
                 [cluster_image] * num_resource_type
             )),
-            "slots": gym.space.Tuple(tuple(
+            "slots": gym.spaces.Tuple(tuple(
                 [job_slot_image] * num_job_slot
             )),
-            "backlog": gym.space.Discrete(size_backlog)
+            "backlog": gym.spaces.Discrete(size_backlog)
         })
 
         self.res: Res = None
@@ -65,7 +65,7 @@ class ResMgmtEnv(gym.Env):
                 reward = 0
 
         self.state = self.res.state()
-        state = np.array(self.state, dtype=int)
+        state = self.state
         reward = reward
         done = self.res.finish()
         info = {}
@@ -86,7 +86,8 @@ class ResMgmtEnv(gym.Env):
         # TODO: 1. can we change action space 2. Is this action assignment ok, e.g. the none action is at the end of space
         self.action_space = gym.spaces.Discrete(len(self.actions))
         self.state = self.res.state()
-        return np.array(self.state, dtype=int)
+        # print(concat.shape)
+        return self.state
 
     def __reward(self) -> float:
         return (-1.0 / self.res.durations()).sum()

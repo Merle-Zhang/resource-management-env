@@ -173,13 +173,17 @@ class Res:
         self.job_slots.jobs[self.job_slots.jobs == job_id] = _EMPTY_CELL
         return True
 
-    def state(self) -> list:
+    def state(self) -> npt.NDArray[np.int_]:
         """The state (image) of clusters, job slots, and backlog.
 
         Returns:
             list: A list of [clusters_state, job_slots_state, backlog_state].
         """
-        return [self.clusters.state, self.job_slots.state, self.backlog.state]
+        shape = list(self.clusters.state.shape)
+        shape = [1] + shape
+        cluster = self.clusters.state.reshape(shape)
+        backlog = np.full_like(cluster, self.backlog.state)
+        return np.concatenate((cluster, self.job_slots.state, backlog), axis=0)
 
     def add_jobs(self, jobs: npt.NDArray[np.bool_]) -> None:
         """Add jobs to res.

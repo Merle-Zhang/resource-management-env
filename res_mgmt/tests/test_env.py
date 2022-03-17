@@ -83,27 +83,31 @@ class TestEnv(unittest.TestCase):
             resource_size=3,
             time_size=5,
             num_job_slot=3,
-            num_job=None,
-            size_backlog=None,
+            num_job=0,
+            size_backlog=1,
             jobs=jobs,
         )
 
         # nothing to test at this stage
 
         env.reset()
-        
+
         self.assertTrue((env.res.job_slots.jobs != _EMPTY_CELL).all())
         self.assertEqual(len(env.res.backlog.queue), 2)
-        np.testing.assert_allclose(env.actions, [0, 1, 2, None])
+        self.assertEqual(list(env.actions), [0, 1, 2, None])
 
-        # env.action_space
+        self.assertTrue(env.action_space.contains(0))
+        self.assertTrue(env.action_space.contains(1))
+        self.assertTrue(env.action_space.contains(2))
+        self.assertTrue(env.action_space.contains(3))
+        self.assertFalse(env.action_space.contains(4))
+        self.assertFalse(env.action_space.contains(-1))
 
         state, reward, done, info = env.step(1)
 
         self.assertEqual(env.res.job_slots.jobs[1], _EMPTY_CELL)
         self.assertEqual(reward, 0)
         self.assertFalse(done)
-
 
 
 if __name__ == '__main__':
