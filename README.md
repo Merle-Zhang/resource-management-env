@@ -9,5 +9,5 @@ OpenAI Gym environment for resource management
 ## How to run (TODO:)
 
 ```shell
-conda install python=3.10 numpy gym
+conda env create -f environment.yml
 ```

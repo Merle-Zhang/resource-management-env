@@ -1,0 +1,9 @@
+name: res-mgmt-rl
+channels:
+  - conda-forge
+dependencies:
+  - numpy=1.22
+  - pip
+  - python=3.10
+  - pip:
+    - gym==0.22.0
