@@ -1,9 +1,15 @@
 name: res-mgmt-rl
 channels:
+  - pytorch # baseline3
   - conda-forge
 dependencies:
+  # pytorch dependencies for baseline3
+  - cpuonly
+  - pytorch
+  # for env
   - numpy=1.22
   - pip
   - python=3.10
   - pip:
-    - gym==0.22.0
+    - gym
+    - stable-baselines3==1.4.0

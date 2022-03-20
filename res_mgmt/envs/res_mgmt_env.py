@@ -72,7 +72,7 @@ class ResMgmtEnv(gym.Env):
         return state, reward, done, info
 
     def reset(self, seed: Optional[int] = None):
-        super().reset(seed=seed)
+        # super().reset(seed=seed) # not supported in gym 0.19.0
 
         self.res = Res(
             num_resource_type=self.num_resource_type,

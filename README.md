@@ -11,3 +11,9 @@ OpenAI Gym environment for resource management
 ```shell
 conda env create -f environment.yml
 ```
+
+Register the Environment
+```shell
+cd .. # or cd to where contains resource-management-env
+pip install -e resource-management-env
+```
