@@ -83,7 +83,7 @@ class TestEnv(unittest.TestCase):
             resource_size=3,
             time_size=5,
             num_job_slot=3,
-            num_job=0,
+            max_num_job=10**3,
             size_backlog=1,
             jobs=jobs,
         )
@@ -94,7 +94,6 @@ class TestEnv(unittest.TestCase):
 
         self.assertTrue((env.res.job_slots.jobs != _EMPTY_CELL).all())
         self.assertEqual(len(env.res.backlog.queue), 2)
-        self.assertEqual(list(env.actions), [0, 1, 2, None])
 
         self.assertTrue(env.action_space.contains(0))
         self.assertTrue(env.action_space.contains(1))
@@ -103,7 +102,7 @@ class TestEnv(unittest.TestCase):
         self.assertFalse(env.action_space.contains(4))
         self.assertFalse(env.action_space.contains(-1))
 
-        state, reward, done, info = env.step(1)
+        state, reward, done, info = env.step(2)
 
         self.assertEqual(env.res.job_slots.jobs[1], _EMPTY_CELL)
         self.assertEqual(reward, 0)

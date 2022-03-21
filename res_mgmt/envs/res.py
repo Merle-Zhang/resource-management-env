@@ -179,11 +179,11 @@ class Res:
         Returns:
             list: A list of [clusters_state, job_slots_state, backlog_state].
         """
-        shape = list(self.clusters.state.shape)
-        shape = [1] + shape
-        cluster = self.clusters.state.reshape(shape)
-        backlog = np.full_like(cluster, self.backlog.state)
-        return np.concatenate((cluster, self.job_slots.state, backlog), axis=0)
+        return np.concatenate((
+            self.clusters.state, 
+            self.job_slots.state, 
+            [self.backlog.state],
+        ), axis=None)
 
     def add_jobs(self, jobs: npt.NDArray[np.bool_]) -> None:
         """Add jobs to res.
