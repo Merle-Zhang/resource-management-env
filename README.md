@@ -17,3 +17,8 @@ Register the Environment
 cd .. # or cd to where contains resource-management-env
 pip install -e resource-management-env
 ```
+
+Create conda environment with Jupyter Lab
+```shell
+conda env create -f environment-dev.yml
+```
