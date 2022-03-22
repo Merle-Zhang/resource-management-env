@@ -83,6 +83,7 @@ class Res:
         """
         self.clusters.time_proceed()
         self.job_slots.refill(self.backlog)
+        self.update_empty_cells_cluster()
 
     def durations(self) -> npt.NDArray[np.int_]:
         """Durations for all jobs in the systems either scheduled or waiting for service.
@@ -173,7 +174,9 @@ class Res:
                     raise ValueError(msg)
                 self.empty_cells_cluster[resource_type,
                                          cluster_time] -= req[resource_type, job_time]
+        self.job_slots.state[self.job_slots.jobs == job_id, :, :, :] = False
         self.job_slots.jobs[self.job_slots.jobs == job_id] = _EMPTY_CELL
+
         return True
 
     def state(self) -> npt.NDArray[np.int_]:
@@ -217,3 +220,6 @@ class Res:
         job_slots = (self.job_slots.jobs == _EMPTY_CELL).all()
         backlog = not self.backlog.queue
         return bool(job_slots and backlog)
+
+    def update_empty_cells_cluster(self) -> None:
+        self.empty_cells_cluster = (self.clusters.state == _EMPTY_CELL).sum(axis=2)

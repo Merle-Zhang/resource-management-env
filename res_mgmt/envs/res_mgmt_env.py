@@ -1,8 +1,10 @@
 from typing import Optional
 import gym
 import numpy as np
+import pygame
 
 from res_mgmt.envs.config import _EMPTY_CELL
+from res_mgmt.envs.render import render
 from res_mgmt.envs.res import Res
 
 
@@ -38,6 +40,7 @@ class ResMgmtEnv(gym.Env):
 
         self.res: Res = None
         self.state = None
+        self.screen = None
 
     def step(self, action: int):
         err_msg = f"{action!r} ({type(action)}) invalid"
@@ -85,3 +88,18 @@ class ResMgmtEnv(gym.Env):
 
     def __reward(self) -> float:
         return (-1.0 / self.res.durations()).sum()
+
+    def my_render(self, filename: str):
+        if self.state is None:
+            return
+        if self.screen is None:
+            pygame.display.init()
+            pygame.font.init()
+        self.screen = render(self.res)
+        pygame.image.save(self.screen, filename)
+
+    def close(self):
+        if self.screen is not None:
+            pygame.display.quit()
+            pygame.font.quit()
+            self.screen = None
