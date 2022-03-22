@@ -22,6 +22,7 @@ class ResMgmtEnv(gym.Env):
         self.resource_size = resource_size
         self.time_size = time_size
         self.num_job_slot = num_job_slot
+        self.max_num_job = max_num_job
         self.jobs = jobs
 
         # TODO: unused action space before reset
@@ -29,7 +30,7 @@ class ResMgmtEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(
             num_job_slot + 1)
 
-        cluster_obs = [max_num_job] * (num_resource_type * time_size * resource_size)
+        cluster_obs = [max_num_job + 1] * (num_resource_type * time_size * resource_size)
         job_slots_obs = [2] * (num_job_slot * num_resource_type * time_size * resource_size)
         backlog_obs = [max_num_job]
         obs = cluster_obs + job_slots_obs + backlog_obs
@@ -74,6 +75,7 @@ class ResMgmtEnv(gym.Env):
             time_size=self.time_size,
             resource_size=self.resource_size,
             num_job_slot=self.num_job_slot,
+            max_num_job=self.max_num_job,
         )
         self.res.add_jobs(self.jobs)
         self.res.time_proceed()

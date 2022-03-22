@@ -62,6 +62,9 @@ class Clusters:
         jobs_in_cluster = np.delete(
             jobs_in_cluster, np.where(jobs_in_cluster == _EMPTY_CELL))
 
+        if jobs_in_cluster.size == 0:
+            return np.array([])
+
         def get_duration(id: int):
             return self.meta[id].duration
         return np.vectorize(get_duration)(jobs_in_cluster)

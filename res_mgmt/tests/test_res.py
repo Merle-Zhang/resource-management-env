@@ -15,11 +15,13 @@ class TestResInit(unittest.TestCase):
         num_job_slot = 3
         time_size = 5
         resource_size = 3
+        max_num_job = 10**3
         res = Res(
             num_resource_type=num_resource_type,
             num_job_slot=num_job_slot,
             time_size=time_size,
             resource_size=resource_size,
+            max_num_job=max_num_job,
         )
 
         self.assertEqual(res.clusters.state.shape,
@@ -30,6 +32,7 @@ class TestResInit(unittest.TestCase):
             time_size,
             resource_size,
         ))
+        self.assertEqual(res.max_num_job, max_num_job)
         self.assertTrue(res.meta is res.clusters.meta)
         self.assertTrue(res.meta is res.job_slots.meta)
         self.assertTrue(res.meta is res.backlog.meta)

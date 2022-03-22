@@ -26,6 +26,7 @@ class Res:
         time_size: int,  # column
         resource_size: int,  # row
         num_job_slot: int,  # first M jobs
+        max_num_job: int,
     ) -> None:
         self.meta: dict[int, Job] = {}
         self.clusters = Clusters(
@@ -44,6 +45,7 @@ class Res:
         self.backlog = Backlog(meta=self.meta)
         self.empty_cells_cluster = np.full(
             (num_resource_type, time_size), resource_size, dtype=int)
+        self.max_num_job = max_num_job
 
     @classmethod
     def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
@@ -57,6 +59,7 @@ class Res:
             num_job_slot=config["num_job_slot"],
             time_size=config["time_size"],
             resource_size=config["resource_size"],
+            max_num_job=config["max_num_job"],
         )
 
     def actions(self) -> list[Optional[int]]:
@@ -179,8 +182,10 @@ class Res:
         Returns:
             list: A list of [clusters_state, job_slots_state, backlog_state].
         """
+        clusters = self.clusters.state.flatten()
+        clusters[clusters == _EMPTY_CELL] = self.max_num_job
         return np.concatenate((
-            self.clusters.state, 
+            clusters, 
             self.job_slots.state, 
             [self.backlog.state],
         ), axis=None)
@@ -211,4 +216,4 @@ class Res:
         """
         job_slots = (self.job_slots.jobs == _EMPTY_CELL).all()
         backlog = not self.backlog.queue
-        return job_slots and backlog
+        return bool(job_slots and backlog)

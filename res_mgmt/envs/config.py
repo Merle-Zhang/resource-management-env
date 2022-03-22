@@ -7,4 +7,5 @@ _DEFAULT_CONFIG: Config = {
     "num_job_slot": 3,      # first M jobs
     "time_size": 5,         # column
     "resource_size": 3,     # row
+    "max_num_job": 10**3,
 }
