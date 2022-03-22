@@ -13,4 +13,5 @@ dependencies:
   - python=3.10
   - pip:
     - gym
+    - pygame
     - stable-baselines3==1.4.0
