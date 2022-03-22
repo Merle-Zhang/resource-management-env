@@ -3,6 +3,8 @@ channels:
   - pytorch # baseline3
   - conda-forge
 dependencies:
+  # dev
+  - autopep8
   - jupyterlab
   # pytorch dependencies for baseline3
   - cpuonly
