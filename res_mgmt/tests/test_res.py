@@ -113,8 +113,8 @@ class TestResSchedule(unittest.TestCase):
             [0, 0, 1, 1, 1],
             [1, 0, 2, 2, 2],
         ])
-        res.job_slots.jobs = np.array([0, 2, 3, 4, _EMPTY_CELL])
-        new_jobs = np.array([0, _EMPTY_CELL, 3, 4, _EMPTY_CELL])
+        res.job_slots.jobs = np.array([0, 2, 3])
+        new_jobs = np.array([0, _EMPTY_CELL, 3])
         res.clusters.state = np.array(
             [[[ 1,  1,  1],
               [ 1,  1,  1],

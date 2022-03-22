@@ -188,8 +188,8 @@ class Res:
         clusters = self.clusters.state.flatten()
         clusters[clusters == _EMPTY_CELL] = self.max_num_job
         return np.concatenate((
-            clusters, 
-            self.job_slots.state, 
+            clusters,
+            self.job_slots.state,
             [self.backlog.state],
         ), axis=None)
 
@@ -222,4 +222,5 @@ class Res:
         return bool(job_slots and backlog)
 
     def update_empty_cells_cluster(self) -> None:
-        self.empty_cells_cluster = (self.clusters.state == _EMPTY_CELL).sum(axis=2)
+        empty_cells = self.clusters.state == _EMPTY_CELL
+        self.empty_cells_cluster = empty_cells.sum(axis=2)

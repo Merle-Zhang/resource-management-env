@@ -93,12 +93,13 @@ colours = [
     "gray",
 ]
 
+
 def render(res: Res):
     (num_job_slot,
-    num_resource_type,
-    time_size,
-    resource_size,
-    ) = res.job_slots.state.shape
+     num_resource_type,
+     time_size,
+     resource_size,
+     ) = res.job_slots.state.shape
 
     unit = 10
 
@@ -120,9 +121,9 @@ def render(res: Res):
         return (x, y, resource_size, time_size)
 
     blocks = [block(s, t)
-        for s in range(num_job_slot + 1)
-        for t in range(num_resource_type)
-    ]
+              for s in range(num_job_slot + 1)
+              for t in range(num_resource_type)
+              ]
 
     def cell(block, x, y, fill):
         (bx, by, _, _) = block
@@ -132,7 +133,8 @@ def render(res: Res):
 
     for slot in range(num_job_slot):
         for type in range(num_resource_type):
-            b = blocks[(slot+1) * num_resource_type + type] # slot + 1 to skip the clusters in blocks
+            # slot + 1 to skip the clusters in blocks
+            b = blocks[(slot+1) * num_resource_type + type]
             for time in range(time_size):
                 for resource in range(resource_size):
                     c = res.job_slots.state[slot, type, time, resource]
@@ -159,8 +161,7 @@ def render(res: Res):
     for rect in blocks:
         pygame.draw.rect(surf, C["black"], scale_tuple(rect, unit), 2)
 
-    screen.blit(surf,(0,0))
-
+    screen.blit(surf, (0, 0))
 
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     textsurface = myfont.render(str(res.backlog.state), False, C["black"])

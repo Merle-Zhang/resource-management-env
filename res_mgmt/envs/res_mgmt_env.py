@@ -15,9 +15,7 @@ class ResMgmtEnv(gym.Env):
         resource_size: int,  # row
         time_size: int,  # column
         num_job_slot: int,  # first M jobs
-        # number of colors, TODO: num_job needed or just len(jobs)?
         max_num_job: int,
-        size_backlog: int,  # TODO: size_backlog needed or just infinite?
         jobs: list  # shape(num_job, num_resource_type)
     ):
         self.num_resource_type = num_resource_type
@@ -27,13 +25,18 @@ class ResMgmtEnv(gym.Env):
         self.max_num_job = max_num_job
         self.jobs = jobs
 
-        # TODO: unused action space before reset
         # first M jobs + the null sign
         self.action_space = gym.spaces.Discrete(
             num_job_slot + 1)
 
-        cluster_obs = [max_num_job + 1] * (num_resource_type * time_size * resource_size)
-        job_slots_obs = [2] * (num_job_slot * num_resource_type * time_size * resource_size)
+        cluster_obs = (
+            [max_num_job + 1] *
+            (num_resource_type * time_size * resource_size)
+        )
+        job_slots_obs = (
+            [2] *
+            (num_job_slot * num_resource_type * time_size * resource_size)
+        )
         backlog_obs = [max_num_job]
         obs = cluster_obs + job_slots_obs + backlog_obs
         self.observation_space = gym.spaces.MultiDiscrete(obs)
@@ -61,7 +64,7 @@ class ResMgmtEnv(gym.Env):
                     reward = 0
         if reward != 0:
             self.res.time_proceed()
-            reward = self.__reward() # TODO: reward before proceed?
+            reward = self.__reward()  # TODO: reward before proceed?
 
         self.state = self.res.state()
         state = self.state
@@ -82,7 +85,6 @@ class ResMgmtEnv(gym.Env):
         )
         self.res.add_jobs(self.jobs)
         self.res.time_proceed()
-        # TODO: 1. can we change action space 2. Is this action assignment ok, e.g. the none action is at the end of space
         self.state = self.res.state()
         return self.state
 

@@ -84,7 +84,6 @@ class TestEnv(unittest.TestCase):
             time_size=5,
             num_job_slot=3,
             max_num_job=10**3,
-            size_backlog=1,
             jobs=jobs,
         )
 
