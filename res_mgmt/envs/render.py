@@ -103,8 +103,11 @@ def render(res: Res):
 
     unit = 10
 
-    width_unit = resource_size * (num_job_slot + 1) + num_job_slot + 4
-    height_unit = time_size * num_resource_type + 3
+    width_unit = (
+        resource_size * (num_job_slot + 1) +
+        num_job_slot + 4 + 3   # 3 for the text
+    )
+    height_unit = time_size * num_resource_type + num_resource_type + 1
 
     width, height = unit * width_unit, unit * height_unit
 
