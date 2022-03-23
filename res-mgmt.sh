@@ -16,4 +16,4 @@ echo `echo $SLURM_JOB_NODELIST | uniq`
 
 #! Run the executable
 
-~/.conda/envs/res-mgmt-rl-dev/bin/python3 testrun.py
+~/.conda/envs/res-mgmt-rl-dev/bin/python3 random_ran_env.py

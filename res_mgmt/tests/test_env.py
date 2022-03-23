@@ -6,6 +6,7 @@ from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.clusters import Clusters
 from res_mgmt.envs.config import _EMPTY_CELL
 from res_mgmt.envs.job import Job
+from res_mgmt.envs.res import Res
 from res_mgmt.envs.res_mgmt_env import ResMgmtEnv
 from res_mgmt.tests.utils import meta_from_durations
 
@@ -84,12 +85,21 @@ class TestEnv(unittest.TestCase):
             time_size=5,
             num_job_slot=3,
             max_num_job=10**3,
-            jobs=jobs,
         )
 
         # nothing to test at this stage
 
-        env.reset()
+        env.res = Res(
+            num_resource_type=env.num_resource_type,
+            time_size=env.time_size,
+            resource_size=env.resource_size,
+            num_job_slot=env.num_job_slot,
+            max_num_job=env.max_num_job,
+        )
+        env.jobs = jobs
+        env.res.add_jobs(env.jobs)
+        env.res.time_proceed()
+        env.state = env.res.state()
 
         self.assertTrue((env.res.job_slots.jobs != _EMPTY_CELL).all())
         self.assertEqual(len(env.res.backlog.queue), 2)

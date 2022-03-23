@@ -4,6 +4,7 @@ import numpy as np
 import pygame
 
 from res_mgmt.envs.config import _EMPTY_CELL
+from res_mgmt.envs.generator import generate_jobs
 from res_mgmt.envs.render import render
 from res_mgmt.envs.res import Res
 
@@ -16,14 +17,12 @@ class ResMgmtEnv(gym.Env):
         time_size: int,  # column
         num_job_slot: int,  # first M jobs
         max_num_job: int,
-        jobs: list  # shape(num_job, num_resource_type)
     ):
         self.num_resource_type = num_resource_type
         self.resource_size = resource_size
         self.time_size = time_size
         self.num_job_slot = num_job_slot
         self.max_num_job = max_num_job
-        self.jobs = jobs
 
         # first M jobs + the null sign
         self.action_space = gym.spaces.Discrete(
@@ -44,6 +43,7 @@ class ResMgmtEnv(gym.Env):
         self.res: Res = None
         self.state = None
         self.screen = None
+        self.jobs = None
 
     def step(self, action: int):
         err_msg = f"{action!r} ({type(action)}) invalid"
@@ -82,6 +82,12 @@ class ResMgmtEnv(gym.Env):
             resource_size=self.resource_size,
             num_job_slot=self.num_job_slot,
             max_num_job=self.max_num_job,
+        )
+        self.jobs = generate_jobs(
+            self.num_resource_type,
+            self.time_size,
+            self.resource_size,
+            self.max_num_job,
         )
         self.res.add_jobs(self.jobs)
         self.res.time_proceed()
