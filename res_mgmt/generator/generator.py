@@ -83,4 +83,5 @@ distri = {
     "normal": normal_random,
 }
 
-print(generate_jobs(2, 5, 3))
+if __name__ == "__main__":
+    print(generate_jobs(2, 5, 3, 5))
