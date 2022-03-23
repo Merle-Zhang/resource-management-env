@@ -156,7 +156,7 @@ def render(res: Res):
                     if c < len(colours):
                         colour = C[colours[c]]
                     else:
-                        colour = list(C.values())[c - len(colours)]
+                        colour = list(C.values())[(c - len(colours)) % len(C.values())]
                     cell(b, resource, time, colour)
                 else:
                     cell(b, resource, time, C["white"])
