@@ -21,7 +21,8 @@ env = ResMgmtEnv(
 max_iteration = 10 ** 5
 # max_iteration = 10
 
-render_per_iteration = max_iteration // 10
+# render_per_iteration = max_iteration // 10
+render_per_iteration = 1000
 
 observation = env.reset()
 t = 0
