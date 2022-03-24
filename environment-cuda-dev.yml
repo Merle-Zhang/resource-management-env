@@ -1,0 +1,27 @@
+name: res-mgmt-rl-cuda-dev
+channels:
+  - pytorch # baseline3
+  - conda-forge
+dependencies:
+  # for gym all and baseline extra
+  - swig # box2d-py
+  # - cython # mujoco-py
+  # - lockfile # mujoco-py
+  # dev
+  - autopep8
+  - jupyterlab
+  # pytorch dependencies for baseline3
+  - torchvision
+  - torchaudio
+  - cudatoolkit=11.3
+  - pytorch
+  # for env
+  - numpy=1.22
+  - pip
+  - python=3.10
+  - pip:
+    - gym
+    - gym[classic_control]
+    - gym[box2d]
+    - pygame
+    - stable-baselines3[extra]
