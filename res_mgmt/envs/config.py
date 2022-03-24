@@ -1,6 +1,8 @@
+from typing import Dict
+
 _EMPTY_CELL: int = -1
 
-Config = dict[str, int]
+Config = Dict[str, int]
 
 _DEFAULT_CONFIG: Config = {
     "num_resource_type": 2,  # d resource types

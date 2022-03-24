@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+from typing import Dict
 
 from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
@@ -26,7 +27,7 @@ class JobSlots:
         num_resource_type: int,  # d resource types
         time_size: int,          # column
         resource_size: int,      # row
-        meta: dict[int, Job],    # meta data of jobs {job_index -> job_meta}
+        meta: Dict[int, Job],    # meta data of jobs {job_index -> job_meta}
     ) -> None:
         shape = (
             num_job_slot,

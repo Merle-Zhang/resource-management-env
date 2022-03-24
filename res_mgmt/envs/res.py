@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 import numpy as np
 import numpy.typing as npt
 
@@ -62,7 +62,7 @@ class Res:
             max_num_job=config["max_num_job"],
         )
 
-    def actions(self) -> list[Optional[int]]:
+    def actions(self) -> List[Optional[int]]:
         """Get available actions.
 
         Could be one of the unscheduled job from job slots 

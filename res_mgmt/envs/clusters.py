@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+from typing import Dict
 
 from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
 from res_mgmt.envs.job import Job
@@ -18,7 +19,7 @@ class Clusters:
         num_resource_type: int,  # d resource types
         time_size: int,          # column
         resource_size: int,      # row
-        meta: dict[int, Job],    # meta data of jobs {job_index -> job_meta}
+        meta: Dict[int, Job],    # meta data of jobs {job_index -> job_meta}
     ) -> None:
         shape = (num_resource_type, time_size, resource_size)
         self.state = np.full(shape, _EMPTY_CELL, dtype=int)

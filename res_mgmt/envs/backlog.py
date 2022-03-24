@@ -1,6 +1,7 @@
 from collections import deque
 import numpy as np
 import numpy.typing as npt
+from typing import Dict, Deque, Tuple
 
 from res_mgmt.envs.job import Job
 
@@ -18,9 +19,9 @@ class Backlog:
 
     def __init__(
         self,
-        meta: dict[int, Job],    # meta data of jobs {job_index -> job_meta}
+        meta: Dict[int, Job],    # meta data of jobs {job_index -> job_meta}
     ) -> None:
-        self.queue = deque[tuple[int, JobImage]]()
+        self.queue: Deque[Tuple[int, JobImage]] = deque()
         self.state = 0
         self.meta = meta
 
@@ -37,7 +38,7 @@ class Backlog:
         self.queue.append((job.id, image))
         self.state += 1
 
-    def get(self) -> tuple[int, JobImage]:
+    def get(self) -> Tuple[int, JobImage]:
         """Get a job from the left side of the queue of backlog.
 
         The caller should check empty before getting the job, otherwise will raise exception.
