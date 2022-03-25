@@ -29,14 +29,14 @@ class ResMgmtEnv(gym.Env):
             num_job_slot + 1)
 
         cluster_obs = (
-            [max_num_job + 1] *
-            (num_resource_type * time_size * resource_size)
+            [resource_size + 1] *
+            (num_resource_type * time_size)
         )
         job_slots_obs = (
-            [2] *
-            (num_job_slot * num_resource_type * time_size * resource_size)
+            [resource_size + 1] *
+            (num_job_slot * num_resource_type * time_size)
         )
-        backlog_obs = [max_num_job]
+        backlog_obs = [max_num_job + 1]
         obs = cluster_obs + job_slots_obs + backlog_obs
         self.observation_space = gym.spaces.MultiDiscrete(obs)
 

@@ -185,11 +185,11 @@ class Res:
         Returns:
             list: A list of [clusters_state, job_slots_state, backlog_state].
         """
-        clusters = self.clusters.state.flatten()
-        clusters[clusters == _EMPTY_CELL] = self.max_num_job
+        clusters = self.empty_cells_cluster
+        job_slots = np.array([self.meta[id].requirements for id in self.job_slots.jobs])
         return np.concatenate((
             clusters,
-            self.job_slots.state,
+            job_slots,
             [self.backlog.state],
         ), axis=None)
 
@@ -210,6 +210,17 @@ class Res:
             job = Job.fromImage(i, jobs[i])
             self.meta[i] = job
             self.backlog.add(job, jobs[i])
+
+        # Add job meta for empty cell so it can be used in state()
+        self.meta[_EMPTY_CELL] = Job(
+            id=_EMPTY_CELL,
+            duration=0,
+            requirements=np.zeros(
+                (num_resource_type, time_size),
+                dtype=np.int_,
+            ),
+            time_max=0,
+        )
 
     def finish(self) -> bool:
         """Check if finished all jobs.
