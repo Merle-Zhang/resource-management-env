@@ -222,6 +222,7 @@ class Res:
             time_max=0,
         )
 
+    # TODO: also check clusters
     def finish(self) -> bool:
         """Check if finished all jobs.
 
