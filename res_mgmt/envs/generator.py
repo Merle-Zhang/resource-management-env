@@ -31,8 +31,8 @@ def generate_jobs(
         time_size,
         resource_size,
     ]
-    durations = random(1, time_size+1, tuple(shape[:2]))
-    resources = random(1, resource_size+1, tuple(shape[:3]))
+    durations = random(1, time_size, tuple(shape[:2]))
+    resources = random(1, resource_size, tuple(shape[:3]))
     jobs = np.full(shape, False, dtype=np.bool_)
     for i in range(n):
         for type in range(num_resource_type):
