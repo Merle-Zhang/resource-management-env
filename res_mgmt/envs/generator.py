@@ -2,7 +2,7 @@ from typing import Union
 from importlib_metadata import distribution
 import numpy as np
 import numpy.typing as npt
-from numpy.random import random_sample, normal
+from numpy.random import normal, randint, random_sample
 
 
 def generate_jobs(
@@ -24,6 +24,47 @@ def generate_jobs(
     Returns:
         npt.NDArray[np.bool_]: Generated data.
     """
+
+    short_jobs = 0.8
+    long_jobs = 1 - short_jobs
+
+    t = time_size / 20
+    r = resource_size
+
+    short_duration = union_random(round(1 * t), round(3 * t), round(short_jobs * n))
+    long_duration = union_random(round(10 * t), round(15 * t), round(long_jobs * n))
+    duration = np.concatenate([short_duration, long_duration])
+    np.random.shuffle(duration)
+
+    dominant_res_index = randint(num_resource_type, size=n)
+    demand_dominant = union_random(round(0.25 * r), round(0.5 * r), n)
+    demand_other = union_random(round(0.05 * r), round(0.1 * r), n)
+
+    def expend(arr):
+        y, x = arr.shape
+        pady = time_size - y
+        padx = resource_size - x
+        return np.pad(arr, ((0, pady), (0, padx)), "constant")
+
+    shape = [
+        n,
+        num_resource_type,
+        time_size,
+        resource_size,
+    ]
+    jobs = np.full(shape, False, dtype=np.bool_)
+
+    for i in range(n):
+        for type in range(num_resource_type):
+            if type == dominant_res_index[i]:
+                demand = demand_dominant[i]
+            else:
+                demand = demand_other[i]
+            job = np.ones((duration[i], demand))
+            job = expend(job)
+            jobs[i, type] = job
+    return jobs
+
     random = distri[distribution]
     shape = [
         n,
