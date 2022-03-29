@@ -15,11 +15,11 @@ def generate_jobs(
     """Generate jobs data.
 
     Args:
-        num_resource_type (int): _description_
-        time_size (int): _description_
-        resource_size (int): _description_
-        n (int, optional): _description_. Defaults to 1000.
-        distribution (str, optional): one of [normal, union]. Defaults to "normal".
+        num_resource_type (int): Number of types of resources.
+        time_size (int): Size of the time axis in the image.
+        resource_size (int): Size of the resource axis in the image.
+        n (int, optional): Number of jobs to be generated. Defaults to 1000.
+        distribution (str, optional): One of [normal, union]. Defaults to "normal".
 
     Returns:
         npt.NDArray[np.bool_]: Generated data.
