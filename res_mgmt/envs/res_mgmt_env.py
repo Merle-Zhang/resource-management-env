@@ -62,9 +62,12 @@ class ResMgmtEnv(gym.Env):
                 if pos != -1:
                     self.res.schedule(job_id, pos)
                     reward = 0
-        if reward != 0:
+        else:
             self.res.time_proceed()
             reward = self.__reward()  # TODO: reward before proceed?
+        if reward == None:
+            # self.res.time_proceed()
+            reward = self.__reward() - 10
 
         self.state = self.res.state()
         state = self.state
