@@ -2,8 +2,9 @@
 
 #SBATCH --job-name res-mgmt
 #SBATCH --nodes 1
-#SBATCH --ntasks-per-node 1
-#SBATCH --time 00:10:00
+#SBATCH --ntasks-per-node 1 
+#SBATCH --cpus-per-task 28
+#SBATCH --time 00:20:00
 #SBATCH --partition cpu
 #SBATCH --output res-mgmt.out
 
@@ -16,4 +17,4 @@ echo `echo $SLURM_JOB_NODELIST | uniq`
 
 #! Run the executable
 
-~/.conda/envs/res-mgmt-rl-dev/bin/python3 random_run_env.py
+~/.conda/envs/res-mgmt-rl-dev/bin/python3 train.py
