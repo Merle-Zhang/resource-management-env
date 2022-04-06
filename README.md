@@ -3,6 +3,7 @@ OpenAI Gym environment for resource management
 
 ## Updates
 
+* Need to penalise invalid selection, otherwise agent won't learn.
 * Following [this guide](https://towardsdatascience.com/beginners-guide-to-custom-environments-in-openai-s-gym-989371673952).
 * Almost finished but refactoring and adding unit tests.
 
