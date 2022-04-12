@@ -51,8 +51,8 @@ class ResMgmtEnv(gym.Env):
         assert self.action_space.contains(action), err_msg
         assert self.state is not None, "Call reset before using step method."
 
-        print("LOG:", f"step ({self.stepcount})")
-        print("LOG:", f"Chose action ({action})")
+        # print("LOG:", f"step ({self.stepcount})")
+        # print("LOG:", f"Chose action ({action})")
         # if step(0) then choose none and step forward
         # else step(N) then choose the job on N-1 (Nth) slot
         action -= 1
@@ -60,22 +60,22 @@ class ResMgmtEnv(gym.Env):
         reward = None
         if action != -1:
             job_id = self.res.job_slots.jobs[action]
-            print("LOG:", f"Job ID ({job_id})")
+            # print("LOG:", f"Job ID ({job_id})")
             if job_id != _EMPTY_CELL:
                 pos = self.res.find_pos(job_id)
-                print("LOG:", f"Pos ({pos})")
+                # print("LOG:", f"Pos ({pos})")
                 if pos != -1:
                     self.res.schedule(job_id, pos)
                     reward = 0
-                    print("LOG:", f"reward ({reward})")
+                    # print("LOG:", f"reward ({reward})")
         else:
             self.res.time_proceed()
             reward = self.__reward()  # TODO: reward before proceed?
-            print("LOG:", f"Time proceed, reward ({reward})")
+            # print("LOG:", f"Time proceed, reward ({reward})")
         if reward == None:
             # self.res.time_proceed()
             reward = self.__reward() - 10
-            print("LOG:", f"No time proceed, reward ({reward})")
+            # print("LOG:", f"No time proceed, reward ({reward})")
 
         self.state = self.res.state()
         state = self.state
@@ -83,8 +83,8 @@ class ResMgmtEnv(gym.Env):
         done = self.res.finish()
         info = {}
         self.my_render(f"render/{self.stepcount}.png")
-        print(self.state)
-        print("======================================")
+        # print(self.state)
+        # print("======================================")
         self.stepcount += 1
         if self.stepcount >= 50:
             done = True
