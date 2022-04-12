@@ -79,4 +79,4 @@ class Backlog:
         """
         if np.random.rand() < self.new_job_rate:
             new_job = self.generator()
-            self.add(Job.fromImage(new_job), new_job)
+            self.add(Job.fromImage(np.random.randint(100), new_job), new_job)

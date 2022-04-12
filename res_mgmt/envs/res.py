@@ -31,6 +31,16 @@ class Res:
         new_job_rate: float,
     ) -> None:
         self.meta: dict[int, Job] = {}
+        # Add job meta for empty cell so it can be used in state()
+        self.meta[_EMPTY_CELL] = Job(
+            id=_EMPTY_CELL,
+            duration=0,
+            requirements=np.zeros(
+                (num_resource_type, time_size),
+                dtype=np.int_,
+            ),
+            time_max=0,
+        )
         self.clusters = Clusters(
             num_resource_type=num_resource_type,
             time_size=time_size,
