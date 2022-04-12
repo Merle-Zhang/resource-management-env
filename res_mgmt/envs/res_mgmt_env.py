@@ -82,7 +82,7 @@ class ResMgmtEnv(gym.Env):
         reward = reward
         done = self.res.finish()
         info = {}
-        self.my_render(f"render/{self.stepcount}.png")
+        # self.my_render(f"render/{self.stepcount}.png")
         # print(self.state)
         # print("======================================")
         self.stepcount += 1
