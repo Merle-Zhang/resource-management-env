@@ -44,13 +44,14 @@ class ResMgmtEnv(gym.Env):
         self.state = None
         self.screen = None
         self.jobs = None
+        self.stepcount = None
 
     def step(self, action: int):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action), err_msg
         assert self.state is not None, "Call reset before using step method."
 
-        print("LOG:", f"step ({self.DEBUG_step})")
+        print("LOG:", f"step ({self.stepcount})")
         print("LOG:", f"Chose action ({action})")
         # if step(0) then choose none and step forward
         # else step(N) then choose the job on N-1 (Nth) slot
@@ -81,10 +82,12 @@ class ResMgmtEnv(gym.Env):
         reward = reward
         done = self.res.finish()
         info = {}
-        self.my_render(f"render/{self.DEBUG_step}.png")
-        self.DEBUG_step += 1
+        self.my_render(f"render/{self.stepcount}.png")
         print(self.state)
         print("======================================")
+        self.stepcount += 1
+        if self.stepcount >= 50:
+            done = True
         return state, reward, done, info
 
     def reset(self, seed: Optional[int] = None):
@@ -106,7 +109,7 @@ class ResMgmtEnv(gym.Env):
         self.res.add_jobs(self.jobs)
         self.res.time_proceed()
         self.state = self.res.state()
-        self.DEBUG_step = 0
+        self.stepcount = 0
         return self.state
 
     def __reward(self) -> float:
