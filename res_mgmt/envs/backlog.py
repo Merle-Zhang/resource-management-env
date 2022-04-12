@@ -20,10 +20,14 @@ class Backlog:
     def __init__(
         self,
         meta: Dict[int, Job],    # meta data of jobs {job_index -> job_meta}
+        generator, # generator for new jobs
+        new_job_rate, # job arrival rate
     ) -> None:
         self.queue: Deque[Tuple[int, JobImage]] = deque()
         self.state = 0
         self.meta = meta
+        self.generator = generator
+        self.new_job_rate = new_job_rate
 
     def add(self, job: Job, image: JobImage) -> None:
         """Add a job to the right side of the queue of backlog.
@@ -69,3 +73,10 @@ class Backlog:
             List of durations of all jobs in backlog.
         """
         return np.array([self.meta[id].duration for id, _ in self.queue])
+
+    def time_proceed(self) -> None:
+        """New job might arrive according to the new job rate.
+        """
+        if np.random.rand() < self.new_job_rate:
+            new_job = self.generator()
+            self.add(Job.fromImage(new_job), new_job)

@@ -5,6 +5,7 @@ import numpy.typing as npt
 from res_mgmt.envs.backlog import Backlog
 from res_mgmt.envs.clusters import Clusters
 from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
+from res_mgmt.envs.generator import get_generator
 from res_mgmt.envs.job import Job
 from res_mgmt.envs.job_slots import JobSlots
 
@@ -27,6 +28,7 @@ class Res:
         resource_size: int,  # row
         num_job_slot: int,  # first M jobs
         max_num_job: int,
+        new_job_rate: float,
     ) -> None:
         self.meta: dict[int, Job] = {}
         self.clusters = Clusters(
@@ -42,7 +44,11 @@ class Res:
             resource_size=resource_size,
             meta=self.meta,
         )
-        self.backlog = Backlog(meta=self.meta)
+        self.backlog = Backlog(
+            meta=self.meta,
+            generator=get_generator(num_resource_type, time_size, resource_size),
+            new_job_rate=new_job_rate,
+        )
         self.empty_cells_cluster = np.full(
             (num_resource_type, time_size), resource_size, dtype=int)
         self.max_num_job = max_num_job
@@ -82,6 +88,7 @@ class Res:
         refill job_slots with the jobs in backlog.
         """
         self.clusters.time_proceed()
+        self.backlog.time_proceed()
         self.job_slots.refill(self.backlog)
         self.update_empty_cells_cluster()
 

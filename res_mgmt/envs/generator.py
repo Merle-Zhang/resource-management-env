@@ -4,6 +4,14 @@ import numpy as np
 import numpy.typing as npt
 from numpy.random import normal, randint, random_sample
 
+def get_generator(
+    num_resource_type: int,
+    time_size: int,
+    resource_size: int,
+):
+    def generator():
+        return generate_jobs(num_resource_type, time_size, resource_size, 1)[0]
+    return generator
 
 def generate_jobs(
     num_resource_type: int,
