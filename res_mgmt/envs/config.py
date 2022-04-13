@@ -10,4 +10,5 @@ _DEFAULT_CONFIG: Config = {
     "time_size": 5,          # column
     "resource_size": 3,      # row
     "max_num_job": 10**3,
+    "new_job_rate": 0.7,
 }

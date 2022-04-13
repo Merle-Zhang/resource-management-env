@@ -9,9 +9,8 @@ def get_generator(
     time_size: int,
     resource_size: int,
 ):
-    def generator():
-        return generate_jobs(num_resource_type, time_size, resource_size, 1)[0]
-    return generator
+    jobset = generate_jobs(num_resource_type, time_size, resource_size)
+    yield from jobset
 
 def generate_jobs(
     num_resource_type: int,
@@ -39,14 +38,19 @@ def generate_jobs(
     t = time_size / 20
     r = resource_size
 
+    # short_duration = union_random(round(1 * t), round(3 * t), round(short_jobs * n))
+    # long_duration = union_random(round(10 * t), round(15 * t), round(long_jobs * n))
     short_duration = union_random(round(1 * t), round(3 * t), round(short_jobs * n))
-    long_duration = union_random(round(10 * t), round(15 * t), round(long_jobs * n))
+    long_duration = union_random(round(13 * t), round(20 * t), round(long_jobs * n))
+
     duration = np.concatenate([short_duration, long_duration])
     np.random.shuffle(duration)
 
     dominant_res_index = randint(num_resource_type, size=n)
-    demand_dominant = union_random(round(0.25 * r), round(0.5 * r), n)
-    demand_other = union_random(round(0.05 * r), round(0.1 * r), n)
+    # demand_dominant = union_random(round(0.25 * r), round(0.5 * r), n)
+    # demand_other = union_random(round(0.05 * r), round(0.1 * r), n)
+    demand_dominant = union_random(round(0.5 * r), round(1 * r), n)
+    demand_other = union_random(round(0.05 * r), round(0.2 * r), n)
 
     def expend(arr):
         y, x = arr.shape

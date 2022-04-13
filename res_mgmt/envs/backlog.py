@@ -40,7 +40,7 @@ class Backlog:
                 (num_resource_type, time_size, resource_size).
         """
         self.queue.append((job.id, image))
-        self.state += 1
+        self.state = min(60, len(self.queue))
 
     def get(self) -> Tuple[int, JobImage]:
         """Get a job from the left side of the queue of backlog.
@@ -63,7 +63,7 @@ class Backlog:
         """
         # if self.queue and self.state > 0:
         result = self.queue.popleft()
-        self.state -= 1
+        self.state = min(60, len(self.queue))
         return result
 
     def durations(self) -> npt.NDArray[np.int_]:
@@ -78,5 +78,8 @@ class Backlog:
         """New job might arrive according to the new job rate.
         """
         if np.random.rand() < self.new_job_rate:
-            new_job = self.generator()
-            self.add(Job.fromImage(np.random.randint(100), new_job), new_job)
+            image = next(self.generator)
+            id = np.random.randint(100)
+            job = Job.fromImage(id, image)
+            self.meta[id] = job
+            self.add(job, image)

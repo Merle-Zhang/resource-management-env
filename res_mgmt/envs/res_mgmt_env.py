@@ -82,14 +82,12 @@ class ResMgmtEnv(gym.Env):
         self.state = self.res.state()
         state = self.state
         reward = reward
-        done = self.res.finish()
+        done = self.stepcount >= 50
         info = {}
         # self.my_render(f"render/{self.stepcount}.png")
         # print(self.state)
         # print("======================================")
         self.stepcount += 1
-        if self.stepcount >= 50:
-            done = True
         return state, reward, done, info
 
     def reset(self, seed: Optional[int] = None):

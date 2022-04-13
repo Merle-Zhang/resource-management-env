@@ -76,6 +76,7 @@ class Res:
             time_size=config["time_size"],
             resource_size=config["resource_size"],
             max_num_job=config["max_num_job"],
+            new_job_rate=config["new_job_rate"],
         )
 
     def actions(self) -> List[Optional[int]]:
