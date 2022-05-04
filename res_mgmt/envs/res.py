@@ -211,34 +211,34 @@ class Res:
             [self.backlog.state],
         ), axis=None)
 
-    def add_jobs(self, jobs: npt.NDArray[np.bool_]) -> None:
-        """Add jobs to res.
+    # def add_jobs(self, jobs: npt.NDArray[np.bool_]) -> None:
+    #     """Add jobs to res.
 
-        Args:
-            jobs (npt.NDArray[np.bool_]): 
-                list of jobs. List shape (num_job, num_resource_type, time_size, resource_size).
-        """
-        (num_job,
-         num_resource_type,
-         time_size,
-         resource_size) = jobs.shape
-        assert((num_resource_type, time_size, resource_size)
-               == self.clusters.state.shape)
-        for i in range(num_job):
-            job = Job.fromImage(i, jobs[i])
-            self.meta[i] = job
-            self.backlog.add(job, jobs[i])
+    #     Args:
+    #         jobs (npt.NDArray[np.bool_]): 
+    #             list of jobs. List shape (num_job, num_resource_type, time_size, resource_size).
+    #     """
+    #     (num_job,
+    #      num_resource_type,
+    #      time_size,
+    #      resource_size) = jobs.shape
+    #     assert((num_resource_type, time_size, resource_size)
+    #            == self.clusters.state.shape)
+    #     for i in range(num_job):
+    #         job = Job.fromImage(i, jobs[i])
+    #         self.meta[i] = job
+    #         self.backlog.add(job, jobs[i])
 
-        # Add job meta for empty cell so it can be used in state()
-        self.meta[_EMPTY_CELL] = Job(
-            id=_EMPTY_CELL,
-            duration=0,
-            requirements=np.zeros(
-                (num_resource_type, time_size),
-                dtype=np.int_,
-            ),
-            time_max=0,
-        )
+    #     # Add job meta for empty cell so it can be used in state()
+    #     self.meta[_EMPTY_CELL] = Job(
+    #         id=_EMPTY_CELL,
+    #         duration=0,
+    #         requirements=np.zeros(
+    #             (num_resource_type, time_size),
+    #             dtype=np.int_,
+    #         ),
+    #         time_max=0,
+    #     )
 
     # TODO: also check clusters
     def finish(self) -> bool:

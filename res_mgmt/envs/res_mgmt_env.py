@@ -59,6 +59,8 @@ class ResMgmtEnv(gym.Env):
         # else step(N) then choose the job on N-1 (Nth) slot
         action -= 1
 
+        proceed = False
+
         reward = None
         if action != -1:
             job_id = self.res.job_slots.jobs[action]
@@ -72,22 +74,25 @@ class ResMgmtEnv(gym.Env):
                     # print("LOG:", f"reward ({reward})")
         else:
             self.res.time_proceed()
+            proceed = True
             reward = self.__reward()  # TODO: reward before proceed?
             # print("LOG:", f"Time proceed, reward ({reward})")
         if reward == None:
             # self.res.time_proceed()
+            # proceed = True
             reward = self.__reward() - 10
             # print("LOG:", f"No time proceed, reward ({reward})")
 
         self.state = self.res.state()
         state = self.state
         reward = reward
-        done = self.stepcount >= 50
+        done = self.stepcount > 50
         info = {}
         # self.my_render(f"render/{self.stepcount}.png")
         # print(self.state)
         # print("======================================")
-        self.stepcount += 1
+        # if proceed:
+        self.stepcount += 1 # TODO: increment count for each step or each time proceed?
         return state, reward, done, info
 
     def reset(self, seed: Optional[int] = None):
