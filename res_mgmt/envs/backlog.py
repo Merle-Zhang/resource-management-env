@@ -4,6 +4,7 @@ import numpy.typing as npt
 from typing import Dict, Deque, Tuple
 
 from res_mgmt.envs.job import Job
+from res_mgmt.envs.config import _EMPTY_CELL, Config, _DEFAULT_CONFIG
 
 JobImage = npt.NDArray[np.bool_]
 
@@ -20,14 +21,27 @@ class Backlog:
     def __init__(
         self,
         meta: Dict[int, Job],    # meta data of jobs {job_index -> job_meta}
-        generator, # generator for new jobs
-        new_job_rate, # job arrival rate
+        generator,  # generator for new jobs
+        new_job_rate,  # job arrival rate
     ) -> None:
         self.queue: Deque[Tuple[int, JobImage]] = deque()
         self.state = 0
         self.meta = meta
         self.generator = generator
         self.new_job_rate = new_job_rate
+
+    @classmethod
+    def fromConfig(cls, config: Config = _DEFAULT_CONFIG):
+        """Create a JobSlots from config.
+
+        Args:
+            config: The config. If not specified, the default config will be used.
+        """
+        return cls(
+            meta=config["meta"],
+            generator=config["generator"],  # generator for new jobs
+            new_job_rate=config["new_job_rate"],
+        )
 
     def add(self, job: Job, image: JobImage) -> None:
         """Add a job to the right side of the queue of backlog.

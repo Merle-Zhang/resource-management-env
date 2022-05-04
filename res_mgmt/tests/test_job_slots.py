@@ -39,7 +39,7 @@ class TestJobSlotsRefill(unittest.TestCase):
 
     def test_normal(self):
         job_slots = JobSlots.fromConfig()
-        backlog = Backlog(meta=None)
+        backlog = Backlog.fromConfig()
         backlog.state = 1
         backlog.queue = deque([
             (

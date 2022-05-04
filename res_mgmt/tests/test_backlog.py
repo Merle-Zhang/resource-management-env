@@ -12,7 +12,8 @@ class TestBacklogInit(unittest.TestCase):
 
     def test_normal(self):
         meta = {1: Job()}
-        backlog = Backlog(meta=meta)
+        backlog = Backlog.fromConfig()
+        backlog.meta = meta
         self.assertEqual(backlog.state, 0)
         self.assertFalse(backlog.queue)
         self.assertTrue(backlog.meta is meta)
@@ -21,7 +22,7 @@ class TestBacklogInit(unittest.TestCase):
 class TestBacklogAdd(unittest.TestCase):
 
     def test_normal(self):
-        backlog = Backlog(meta=None)
+        backlog = Backlog.fromConfig()
         backlog.state = 1
         backlog.queue = deque([
             (
@@ -107,7 +108,7 @@ class TestBacklogAdd(unittest.TestCase):
 class TestBacklogGet(unittest.TestCase):
 
     def test_normal(self):
-        backlog = Backlog(meta=None)
+        backlog = Backlog.fromConfig()
         backlog.state = 1
         backlog.queue = deque([
             (
@@ -161,7 +162,8 @@ class TestBacklogDurations(unittest.TestCase):
             7: 1,
             8: 2,
         })
-        backlog = Backlog(meta=meta)
+        backlog = Backlog.fromConfig()
+        backlog.meta = meta
         backlog.queue = deque([
             (1, None),
             (4, None),

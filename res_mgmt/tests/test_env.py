@@ -85,6 +85,7 @@ class TestEnv(unittest.TestCase):
             time_size=5,
             num_job_slot=3,
             max_num_job=10**3,
+            new_job_rate=0.7,
         )
 
         # nothing to test at this stage
@@ -95,10 +96,17 @@ class TestEnv(unittest.TestCase):
             resource_size=env.resource_size,
             num_job_slot=env.num_job_slot,
             max_num_job=env.max_num_job,
+            new_job_rate=env.new_job_rate,
         )
         env.jobs = jobs
-        env.res.add_jobs(env.jobs)
-        env.res.time_proceed()
+        # env.res.add_jobs(env.jobs)
+        for i in range(len(env.jobs)):
+          job = Job.fromImage(i, jobs[i])
+          env.res.meta[i] = job
+          env.res.backlog.add(job, jobs[i])
+        env.res.clusters.time_proceed()
+        env.res.job_slots.refill(env.res.backlog)
+        env.res.update_empty_cells_cluster()
         env.state = env.res.state()
 
         self.assertTrue((env.res.job_slots.jobs != _EMPTY_CELL).all())
@@ -111,6 +119,7 @@ class TestEnv(unittest.TestCase):
         self.assertFalse(env.action_space.contains(4))
         self.assertFalse(env.action_space.contains(-1))
 
+        env.stepcount = 0
         state, reward, done, info = env.step(2)
 
         self.assertEqual(env.res.job_slots.jobs[1], _EMPTY_CELL)
